@@ -5,10 +5,12 @@ import {
   IsStrongPassword,
 } from 'class-validator';
 import { passwordValidationOption } from 'src/common/variables/validation/passwordValidation';
+import { IsUnique } from 'src/common/decorators/IsUnique';
 
 export class CreateUsersPayload {
   @IsNotEmpty()
   @IsEmail()
+  @IsUnique({ tableName: 'users', column: 'email' })
   readonly email: string;
 
   @IsNotEmpty()
