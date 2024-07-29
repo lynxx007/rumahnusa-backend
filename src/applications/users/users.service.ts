@@ -11,13 +11,13 @@ export class UsersService {
     private userRepository: Repository<User>,
   ) {}
 
-  create(payload: CreateUsersPayload): Promise<User> {
+  async create(payload: CreateUsersPayload): Promise<User> {
     const user = new User();
     user.email = payload.email;
     user.password = payload.password; // Todo: Encrypt Password
     user.first_name = payload.first_name;
     user.last_name = payload.last_name;
 
-    return this.userRepository.save(user);
+    return await this.userRepository.save(user);
   }
 }
