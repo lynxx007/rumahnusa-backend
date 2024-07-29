@@ -4,6 +4,7 @@ import {
   IsEmail,
   IsStrongPassword,
 } from 'class-validator';
+import { passwordValidationOption } from 'src/common/variables/validation/passwordValidation';
 
 export class CreateUsersPayload {
   @IsNotEmpty()
@@ -19,6 +20,6 @@ export class CreateUsersPayload {
   readonly last_name: string;
 
   @IsNotEmpty()
-  @IsStrongPassword()
+  @IsStrongPassword(passwordValidationOption)
   readonly password: string;
 }
