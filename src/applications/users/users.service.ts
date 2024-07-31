@@ -20,7 +20,7 @@ export class UsersService {
 
     const user = new User();
     user.email = payload.email;
-    user.password = hashedPassword; // Todo: Encrypt Password
+    user.password = hashedPassword;
     user.first_name = payload.first_name;
     user.last_name = payload.last_name;
 
