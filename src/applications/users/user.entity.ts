@@ -10,26 +10,26 @@ import {
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+    id: string;
 
   @Column('varchar')
-  first_name: string;
+    first_name: string;
 
   @Column('varchar')
-  last_name: string;
+    last_name: string;
 
   @Column('varchar')
-  email: string;
+    email: string;
 
   @Column('varchar')
-  password: string;
+    password: string;
 
   @CreateDateColumn()
-  created_at: Date;
+    created_at: Date;
 
   @UpdateDateColumn()
-  updated_at: Date;
+    updated_at: Date;
 
   @DeleteDateColumn()
-  deleted_at: Date;
+    deleted_at: Date;
 }
