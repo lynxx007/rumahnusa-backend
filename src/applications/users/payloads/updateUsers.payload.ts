@@ -1,9 +1,4 @@
-import {
-  IsString,
-  IsOptional,
-  IsEmail,
-  IsStrongPassword,
-} from 'class-validator';
+import { IsString, IsOptional, IsEmail, IsStrongPassword } from 'class-validator';
 
 export class UpdateUsersPayload {
   @IsOptional()

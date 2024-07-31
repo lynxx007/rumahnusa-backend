@@ -4,17 +4,23 @@ import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { CreateUsersPayload } from './payloads/createUsers.payload';
 
+// Services
+import { AuthenticationsService } from '../authentications/authentications.service';
+
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private authService: AuthenticationsService,
   ) {}
 
   async create(payload: CreateUsersPayload): Promise<User> {
+    const hashedPassword: string = await this.authService.hashPassword(payload.password);
+
     const user = new User();
     user.email = payload.email;
-    user.password = payload.password; // Todo: Encrypt Password
+    user.password = hashedPassword; // Todo: Encrypt Password
     user.first_name = payload.first_name;
     user.last_name = payload.last_name;
 

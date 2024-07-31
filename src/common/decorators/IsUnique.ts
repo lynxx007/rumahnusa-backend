@@ -8,10 +8,7 @@ export type IsUniqeInterface = {
 };
 
 // decorator function
-export function IsUnique(
-  options: IsUniqeInterface,
-  validationOptions?: ValidationOptions,
-) {
+export function IsUnique(options: IsUniqeInterface, validationOptions?: ValidationOptions) {
   return function (object: any, propertyName: string) {
     registerDecorator({
       name: 'IsUnique',
