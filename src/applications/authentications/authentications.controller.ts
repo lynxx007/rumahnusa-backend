@@ -2,6 +2,7 @@ import { Controller, Post } from '@nestjs/common';
 import { AuthenticationsService } from './authentications.service';
 import { LoginPayload } from './payloads/loginPayload';
 import { Body } from '@nestjs/common';
+import { RegistrationPayload } from './payloads/registrationPayload';
 
 @Controller('auth')
 export class AuthenticationsController {
@@ -10,5 +11,10 @@ export class AuthenticationsController {
   @Post('login')
   login(@Body() payload: LoginPayload) {
     return this.authenticationsService.validateLogin(payload);
+  }
+
+  @Post('register')
+  register(@Body() payload: RegistrationPayload) {
+    return payload;
   }
 }
