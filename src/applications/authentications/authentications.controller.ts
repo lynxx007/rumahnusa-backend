@@ -15,6 +15,7 @@ export class AuthenticationsController {
 
   @Post('register')
   register(@Body() payload: RegistrationPayload) {
-    return payload;
+    return this.authenticationsService.validateRegistration(payload);
+    //TODO: Activity Log
   }
 }

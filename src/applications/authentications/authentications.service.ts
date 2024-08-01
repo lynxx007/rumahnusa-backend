@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { SALT_ROUNDS } from 'src/config/security';
 import { User } from '../users/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LoginPayload } from './payloads/loginPayload';
-import { NotFoundException } from '@nestjs/common';
+import { RegistrationPayload } from './payloads/registrationPayload';
 
 @Injectable()
 export class AuthenticationsService {
@@ -29,9 +29,24 @@ export class AuthenticationsService {
     try {
       const user: User = await this.userRepository.findOneByOrFail({ email: payload.email });
       // TODO: JWT Implementation
+      // TODO: Password Matching
       return user; 
     } catch (err) {
-      throw new NotFoundException(err);
+      throw new NotFoundException('Invalid Email or Password');
+    }
+  }
+
+  async validateRegistration(payload: RegistrationPayload): Promise<User> {
+    try {
+      const newUser = new User();
+      newUser.email = payload.email;
+      newUser.first_name = payload.first_name;
+      newUser.last_name = payload.last_name;
+      newUser.password = await this.hashPassword(payload.password);
+
+      return this.userRepository.create(newUser);
+    } catch (error) {
+      throw new InternalServerErrorException('Something went wrong');
     }
   }
 }
