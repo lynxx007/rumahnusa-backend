@@ -6,7 +6,7 @@ import {
   ValidateIf,
   IsIn,
 } from 'class-validator';
-import { passwordValidationOption } from 'src/common/variables/validation/passwordValidation';
+import { passwordValidationOption } from 'src/common/consts/validation/passwordValidation';
 import { IsUnique } from 'src/common/decorators/IsUnique';
   
 export class RegistrationPayload {

@@ -1,8 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { HttpExceptionMessages } from 'src/common/const/exceptions/message';
 import { User } from './user.entity';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
+
+// Payloads
 import { CreateUsersPayload } from './payloads/createUsers.payload';
+import { UpdateUsersPayload } from './payloads/updateUsers.payload';
 
 // Services
 import { AuthenticationsService } from '../authentications/authentications.service';
@@ -29,5 +33,24 @@ export class UsersService {
 
   async findAll(): Promise<User[]> {
     return await this.userRepository.find();
+  }
+
+  async update(payload: UpdateUsersPayload, id: string): Promise<UpdateResult> {
+    const user: User = await this.userRepository.findOne({ where: { id } });
+    if (!user) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
+    try {
+      
+      const data: Partial<User> = {
+        email: payload.email,
+        password: payload.password ? await this.authService.hashPassword(payload.password) : user.password,
+        first_name: payload.first_name,
+        last_name: payload.last_name,
+      };
+
+      return this.userRepository.update({ id }, data );  
+    } catch (error) {
+      throw new InternalServerErrorException(HttpExceptionMessages.INTERNAL_SERVER);
+    }
+    
   }
 }
