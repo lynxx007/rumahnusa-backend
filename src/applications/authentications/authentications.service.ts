@@ -44,7 +44,7 @@ export class AuthenticationsService {
       newUser.last_name = payload.last_name;
       newUser.password = await this.hashPassword(payload.password);
 
-      return this.userRepository.create(newUser);
+      return this.userRepository.save(newUser);
     } catch (error) {
       throw new InternalServerErrorException('Something went wrong');
     }
