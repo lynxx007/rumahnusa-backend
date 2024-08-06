@@ -68,7 +68,22 @@ export class UsersService {
     } catch (error) {
       // TODO: Create a custom error translator
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(error);
+      throw new InternalServerErrorException(HttpExceptionMessages.INTERNAL_SERVER);
+    }
+  }
+
+  async findOne(id: string): Promise<CustomResponse> {
+    try {
+      const user: User = await this.userRepository.findOne({ where: { id } });
+      if (!user) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
+      return new CustomResponse(
+        HttpCustomMessages.DEFAULT,
+        'ok', 
+        user
+      );
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException(HttpExceptionMessages.INTERNAL_SERVER);
     }
   }
 }
