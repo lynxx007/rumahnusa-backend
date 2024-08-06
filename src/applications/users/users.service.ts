@@ -2,14 +2,15 @@ import { Injectable, InternalServerErrorException, NotFoundException } from '@ne
 import { InjectRepository } from '@nestjs/typeorm';
 import { HttpExceptionMessages } from 'src/common/const/exceptions/message';
 import { User } from './user.entity';
-import { Repository, UpdateResult } from 'typeorm';
-
+import { Repository } from 'typeorm';
+import { CustomResponse } from 'src/common/const/types/response';
 // Payloads
 import { CreateUsersPayload } from './payloads/createUsers.payload';
 import { UpdateUsersPayload } from './payloads/updateUsers.payload';
 
 // Services
 import { AuthenticationsService } from '../authentications/authentications.service';
+import { HttpCustomMessages } from 'src/common/const/http/message';
 
 @Injectable()
 export class UsersService {
@@ -32,10 +33,11 @@ export class UsersService {
   }
 
   async findAll(): Promise<User[]> {
+    // TODO: Exclude currently logged in user in the response
     return await this.userRepository.find();
   }
 
-  async update(payload: UpdateUsersPayload, id: string): Promise<UpdateResult> {
+  async update(payload: UpdateUsersPayload, id: string): Promise<CustomResponse> {
     const user: User = await this.userRepository.findOne({ where: { id } });
     if (!user) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
     try {
@@ -47,7 +49,9 @@ export class UsersService {
         last_name: payload.last_name,
       };
 
-      return this.userRepository.update({ id }, data );  
+      await this.userRepository.update({ id }, data );  
+
+      return new CustomResponse(HttpCustomMessages.UPDATE_SUCCESS);
     } catch (error) {
       throw new InternalServerErrorException(HttpExceptionMessages.INTERNAL_SERVER);
     }
