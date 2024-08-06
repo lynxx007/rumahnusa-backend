@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LoginPayload } from './payloads/loginPayload';
 import { RegistrationPayload } from './payloads/registrationPayload';
+import { HttpExceptionMessages } from 'src/common/const/exceptions/message';
 
 @Injectable()
 export class AuthenticationsService {
@@ -29,10 +30,11 @@ export class AuthenticationsService {
     try {
       const user: User = await this.userRepository.findOneByOrFail({ email: payload.email });
       // TODO: JWT Implementation
-      // TODO: Password Matching
+      const isPasswordValid: boolean = await this.validatePassword(payload.password, user.password);
+      if (!isPasswordValid) throw new NotFoundException(HttpExceptionMessages.LOGIN_FAILED);
       return user; 
     } catch (err) {
-      throw new NotFoundException('Invalid Email or Password');
+      throw new NotFoundException(HttpExceptionMessages.LOGIN_FAILED);
     }
   }
 
