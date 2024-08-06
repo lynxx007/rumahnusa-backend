@@ -53,8 +53,22 @@ export class UsersService {
 
       return new CustomResponse(HttpCustomMessages.UPDATE_SUCCESS);
     } catch (error) {
+      if (error instanceof NotFoundException) throw error;
       throw new InternalServerErrorException(HttpExceptionMessages.INTERNAL_SERVER);
     }
     
+  }
+
+  async destroy(id: string): Promise<CustomResponse> {
+    try {
+      const user: User = await this.userRepository.findOne({ where: { id } });
+      if (!user) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
+      await this.userRepository.softDelete(id);
+      return new CustomResponse(HttpCustomMessages.DELETE_SUCCESS);
+    } catch (error) {
+      // TODO: Create a custom error translator
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException(error);
+    }
   }
 }
