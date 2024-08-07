@@ -10,9 +10,10 @@ import { UsersModule } from './users/users.module';
 //Custom Validation Rules
 import { IsUniqueConstraint } from 'src/common/rules/isUniqueConstraint';
 import { AuthenticationsModule } from './authentications/authentications.module';
+import { RolesModule } from './roles/roles.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(DB_CONFIG), UsersModule, AuthenticationsModule],
+  imports: [TypeOrmModule.forRoot(DB_CONFIG), UsersModule, AuthenticationsModule, RolesModule],
   controllers: [AppController],
   providers: [AppService, IsUniqueConstraint],
 })

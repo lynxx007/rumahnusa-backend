@@ -29,7 +29,7 @@ export class UsersService {
     user.first_name = payload.first_name;
     user.last_name = payload.last_name;
 
-    return await this.userRepository.save(user);
+    return this.userRepository.save(user);
   }
 
   async findAll(): Promise<User[]> {
