@@ -5,7 +5,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+
+import { Role } from '../roles/role.entity';
 
 @Entity('users')
 export class User {
@@ -32,4 +36,8 @@ export class User {
 
   @DeleteDateColumn()
     deleted_at: Date;
+
+  @ManyToOne(() => Role, (role) => role.users)
+  @JoinColumn({ name: 'role_id' })
+    role: Role;
 }

@@ -24,4 +24,7 @@ export class CreateUsersPayload {
   @IsNotEmpty()
   @IsStrongPassword(passwordValidationOption)
   readonly password: string;
+
+  @IsNotEmpty()
+  readonly role_id: string;
 }

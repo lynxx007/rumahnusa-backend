@@ -4,6 +4,7 @@ import { HttpExceptionMessages } from 'src/common/const/exceptions/message';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { CustomResponse } from 'src/common/const/types/response';
+import { Role } from '../roles/role.entity';
 // Payloads
 import { CreateUsersPayload } from './payloads/createUsers.payload';
 import { UpdateUsersPayload } from './payloads/updateUsers.payload';
@@ -17,24 +18,34 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Role)
+    private roleRepository: Repository<Role>,
     private authService: AuthenticationsService,
   ) {}
 
   async create(payload: CreateUsersPayload): Promise<User> {
-    const hashedPassword: string = await this.authService.hashPassword(payload.password);
+    try {
+      const hashedPassword: string = await this.authService.hashPassword(payload.password);
+      const role: Role = await this.roleRepository.findOne({ where: { id: payload.role_id } });
+      if (!role) throw new NotFoundException('Invalid role.');
 
-    const user = new User();
-    user.email = payload.email;
-    user.password = hashedPassword;
-    user.first_name = payload.first_name;
-    user.last_name = payload.last_name;
+      const user = new User();
+      user.email = payload.email;
+      user.password = hashedPassword;
+      user.first_name = payload.first_name;
+      user.last_name = payload.last_name;
+      user.role = role;
 
-    return this.userRepository.save(user);
+      return this.userRepository.save(user);
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   async findAll(): Promise<User[]> {
     // TODO: Exclude currently logged in user in the response
-    return await this.userRepository.find();
+    return await this.userRepository.find({ relations: ['role'] });
   }
 
   async update(payload: UpdateUsersPayload, id: string): Promise<CustomResponse> {
