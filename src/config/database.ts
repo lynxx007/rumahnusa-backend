@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 // Entities
 import { User } from 'src/applications/users/user.entity';
 import { Role } from 'src/applications/roles/role.entity';
+import { Permission } from 'src/applications/permissions/permission.entity';
 
 dotenv.config();
 
@@ -14,6 +15,6 @@ export const DB_CONFIG: TypeOrmModuleOptions = {
   database: process.env.DB_NAME,
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
-  entities: [User, Role],
+  entities: [User, Role, Permission],
   synchronize: true,
 };
