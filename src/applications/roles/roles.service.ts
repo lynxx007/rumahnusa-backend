@@ -46,12 +46,14 @@ export class RolesService {
       if (!role) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
 
       const data: Partial<Role> = {
+        id,
         title: payload.title,
+        permissions: payload.permissions,
       };
 
-      await this.roleRepository.update({ id }, data);
+      const res = await this.roleRepository.save(data);
 
-      return new CustomResponse(HttpCustomMessages.UPDATE_SUCCESS); 
+      return new CustomResponse(HttpCustomMessages.UPDATE_SUCCESS, null, res); 
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
       throw new InternalServerErrorException(HttpExceptionMessages.INTERNAL_SERVER);
