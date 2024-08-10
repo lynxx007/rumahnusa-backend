@@ -8,6 +8,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 
 import { Role } from '../roles/role.entity';
 
@@ -25,12 +26,14 @@ export class User {
   @Column('varchar')
     email: string;
 
+  @Exclude({ toPlainOnly: true })
   @Column('varchar')
     password: string;
 
   @CreateDateColumn()
     created_at: Date;
 
+  @Exclude({ toPlainOnly: true })  
   @UpdateDateColumn()
     updated_at: Date;
 
