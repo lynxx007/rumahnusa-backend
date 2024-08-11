@@ -37,10 +37,13 @@ export class User {
   @UpdateDateColumn()
     updated_at: Date;
 
+  @Exclude({ toPlainOnly: true })  
   @DeleteDateColumn()
     deleted_at: Date;
 
   @ManyToOne(() => Role, (role) => role.users)
   @JoinColumn({ name: 'role_id' })
     role: Role;
+
+  //TODO: display permissions on user load
 }

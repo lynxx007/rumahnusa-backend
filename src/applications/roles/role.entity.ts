@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Permission } from '../permissions/permission.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity('roles')
 export class Role {
@@ -23,9 +24,11 @@ export class Role {
     @CreateDateColumn()
       created_at: Date;
 
+    @Exclude({ toPlainOnly: true })  
     @UpdateDateColumn()
       updated_at: Date;
 
+    @Exclude({ toPlainOnly: true })  
     @DeleteDateColumn()
       deleted_at: Date;
 
