@@ -3,7 +3,7 @@ import { CreateRolesPayload } from './payloads/createRoles.payload';
 import { UpdateRolesPayload } from './payloads/updateRoles.payload';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-
+import { paginate, Pagination, IPaginationOptions } from 'nestjs-typeorm-paginate';
 import { Role } from './role.entity';
 import { HttpExceptionMessages } from 'src/common/const/exceptions/message';
 import { CustomResponse } from 'src/common/const/types/response';
@@ -74,5 +74,12 @@ export class RolesService {
       if (error instanceof NotFoundException) throw error;
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  async paginate(options: IPaginationOptions): Promise<Pagination<Role>> {
+    const queryBuilder = this.roleRepository.createQueryBuilder('role');
+    queryBuilder.orderBy('role.created_at', 'DESC');
+
+    return paginate<Role>(queryBuilder, options);
   }
 }

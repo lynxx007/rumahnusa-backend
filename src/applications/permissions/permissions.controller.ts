@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common';
 import { PermissionsService } from './permissions.service';
 import { CreatePermissionsPayload } from './payloads/createPermissions.payload';
 import { UpdatePermissionsPayload } from './payloads/updatePermission.payload';
+import { QUERY } from 'src/common/const/http/query_parameters';
 
 @Controller('permissions')
 export class PermissionsController {
@@ -13,8 +14,11 @@ export class PermissionsController {
   }
 
   @Get()
-  index() {
-    return this.permissionsService.findAll();
+  index(
+    @Query('page') page: number = QUERY.DEFAULT_PAGE,
+    @Query('limit') limit: number = QUERY.DEFAULT_LIMIT
+  ) {
+    return this.permissionsService.paginate({ page, limit });
   }
 
   @Put(':id')

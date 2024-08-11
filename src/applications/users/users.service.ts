@@ -5,6 +5,7 @@ import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { CustomResponse } from 'src/common/const/types/response';
 import { Role } from '../roles/role.entity';
+import { paginate, Pagination, IPaginationOptions } from 'nestjs-typeorm-paginate';
 // Payloads
 import { CreateUsersPayload } from './payloads/createUsers.payload';
 import { UpdateUsersPayload } from './payloads/updateUsers.payload';
@@ -96,5 +97,14 @@ export class UsersService {
       if (error instanceof NotFoundException) throw error;
       throw new InternalServerErrorException(HttpExceptionMessages.INTERNAL_SERVER);
     }
+  }
+
+  async paginate(options: IPaginationOptions): Promise<Pagination<User>> {
+    const queryBuilder = this.userRepository.createQueryBuilder('user');
+    queryBuilder
+      .leftJoinAndSelect('user.role', 'role')
+      .orderBy('user.created_at', 'DESC');
+
+    return paginate<User>(queryBuilder, options);
   }
 }

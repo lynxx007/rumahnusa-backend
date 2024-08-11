@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, Query } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { CreateRolesPayload } from './payloads/createRoles.payload';
 import { UpdateRolesPayload } from './payloads/updateRoles.payload';
+import { QUERY } from 'src/common/const/http/query_parameters';
 
 @Controller('roles')
 export class RolesController {
@@ -14,8 +15,11 @@ export class RolesController {
   }
 
   @Get()
-  index() {
-    return this.rolesService.findAll();
+  index(
+    @Query('page') page: number = QUERY.DEFAULT_PAGE,
+    @Query('limit') limit: number = QUERY.DEFAULT_LIMIT,
+  ) {
+    return this.rolesService.paginate({ page, limit });
   }
 
   @Get(':id')

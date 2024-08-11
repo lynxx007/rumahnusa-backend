@@ -7,6 +7,7 @@ import { Permission } from './permission.entity';
 import { HttpExceptionMessages } from 'src/common/const/exceptions/message';
 import { CustomResponse } from 'src/common/const/types/response';
 import { HttpCustomMessages } from 'src/common/const/http/message';
+import { paginate, Pagination, IPaginationOptions } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class PermissionsService {
@@ -54,5 +55,12 @@ export class PermissionsService {
       if (error instanceof NotFoundException) throw error;
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  async paginate(options: IPaginationOptions): Promise<Pagination<Permission>> {
+    const queryBuilder = this.permissionRepository.createQueryBuilder('permission');
+    queryBuilder.orderBy('permission.created_at', 'DESC');
+
+    return paginate<Permission>(queryBuilder, options);
   }
 }
