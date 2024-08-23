@@ -95,7 +95,7 @@ export class UsersService {
       );
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(HttpExceptionMessages.INTERNAL_SERVER);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
