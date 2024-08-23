@@ -45,5 +45,4 @@ export class User {
   @JoinColumn({ name: 'role_id' })
     role: Role;
 
-  //TODO: display permissions on user load
 }

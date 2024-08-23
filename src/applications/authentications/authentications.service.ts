@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { LoginPayload } from './payloads/loginPayload';
 import { RegistrationPayload } from './payloads/registrationPayload';
 import { HttpExceptionMessages } from 'src/common/const/exceptions/message';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthenticationsService {
@@ -15,6 +16,7 @@ export class AuthenticationsService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private jwtService: JwtService
   ) {}
 
   async hashPassword(password: string): Promise<string> {
@@ -28,7 +30,7 @@ export class AuthenticationsService {
 
   async validateLogin(payload: LoginPayload): Promise<User> {
     try {
-      const user: User = await this.userRepository.findOneByOrFail({ email: payload.email });
+      const user: User = await this._findAuthenticatedUser(payload.email);
       // TODO: JWT Implementation
       const isPasswordValid: boolean = await this.validatePassword(payload.password, user.password);
       if (!isPasswordValid) throw new NotFoundException(HttpExceptionMessages.LOGIN_FAILED);
@@ -50,5 +52,19 @@ export class AuthenticationsService {
     } catch (error) {
       throw new InternalServerErrorException('Something went wrong');
     }
+  }
+
+  async _findAuthenticatedUser(userEmail: string): Promise<User> {
+    const user: User = await this.userRepository.createQueryBuilder('user')
+      .leftJoinAndSelect('user.role', 'role')
+      .leftJoinAndSelect('role.permissions', 'permission')
+      .where('user.email = :email', { email: userEmail })
+      .getOne();
+    
+
+    // TODO: isEmpty helper
+    if (!user) throw new NotFoundException(HttpExceptionMessages.LOGIN_FAILED);
+
+    return user;
   }
 }
