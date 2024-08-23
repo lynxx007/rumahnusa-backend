@@ -29,8 +29,7 @@ export class RolesService {
 
   async findOne(id: string): Promise<Role> {
     try {
-      //TODO: get with permissions
-      const role: Role = await this.roleRepository.findOne({ where: { id }, relations: ['users'] });
+      const role: Role = await this.roleRepository.findOne({ where: { id }, relations: ['users', 'permissions'] });
       if (!role) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
       return role;
     } catch (error) {
