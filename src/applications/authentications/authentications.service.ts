@@ -8,6 +8,8 @@ import { LoginPayload } from './payloads/loginPayload';
 import { RegistrationPayload } from './payloads/registrationPayload';
 import { HttpExceptionMessages } from 'src/common/const/exceptions/message';
 import { JwtService } from '@nestjs/jwt';
+import { mapUserToJwtPayload, mapUserToAuthResponse } from 'src/mapper/users';
+import { AuthenticatedUserResponse } from 'src/common/const/types/auth';
 
 @Injectable()
 export class AuthenticationsService {
@@ -28,13 +30,17 @@ export class AuthenticationsService {
     return bcrypt.compare(password, hashedPassword);
   }
 
-  async validateLogin(payload: LoginPayload): Promise<User> {
+  async validateLogin(payload: LoginPayload): Promise<AuthenticatedUserResponse> {
     try {
       const user: User = await this._findAuthenticatedUser(payload.email);
       // TODO: JWT Implementation
       const isPasswordValid: boolean = await this.validatePassword(payload.password, user.password);
       if (!isPasswordValid) throw new NotFoundException(HttpExceptionMessages.LOGIN_FAILED);
-      return user; 
+      
+      // generate jwt token
+      const jwtToken = this.jwtService.sign(mapUserToJwtPayload(user));
+
+      return mapUserToAuthResponse(user, jwtToken); 
     } catch (err) {
       throw new NotFoundException(HttpExceptionMessages.LOGIN_FAILED);
     }
