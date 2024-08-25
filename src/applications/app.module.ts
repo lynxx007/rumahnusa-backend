@@ -12,9 +12,10 @@ import { IsUniqueConstraint } from 'src/common/rules/isUniqueConstraint';
 import { AuthenticationsModule } from './authentications/authentications.module';
 import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
+import { SeederModule } from 'src/database/seeder/main.seeder';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(DB_CONFIG), UsersModule, AuthenticationsModule, RolesModule, PermissionsModule],
+  imports: [TypeOrmModule.forRoot(DB_CONFIG), UsersModule, AuthenticationsModule, RolesModule, PermissionsModule, SeederModule],
   controllers: [AppController],
   providers: [AppService, IsUniqueConstraint],
 })

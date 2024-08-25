@@ -33,7 +33,6 @@ export class AuthenticationsService {
   async validateLogin(payload: LoginPayload): Promise<AuthenticatedUserResponse> {
     try {
       const user: User = await this._findAuthenticatedUser(payload.email);
-      // TODO: JWT Implementation
       const isPasswordValid: boolean = await this.validatePassword(payload.password, user.password);
       if (!isPasswordValid) throw new NotFoundException(HttpExceptionMessages.LOGIN_FAILED);
       
