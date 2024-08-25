@@ -9,3 +9,5 @@ export interface AuthenticatedUser {
 export interface AuthenticatedUserResponse extends AuthenticatedUser {
     token: string
 }
+
+export interface JwtContext extends AuthenticatedUser {};
