@@ -1,0 +1,23 @@
+name: Deploy Staging
+on: workflow_dispatch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SECRET_KEY }}
+
+      - name: Add Linode to known hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Connect to Linode and run deployment script
+        run: |
+          ssh root@${{ secrets.SERVER_IP }} './deployment_scripts/staging_situkang.sh'
