@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, Put, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Get, Put, Param, Delete, Query, UseGuards, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUsersPayload } from './payloads/createUsers.payload';
 import { UpdateUsersPayload } from './payloads/updateUsers.payload';
@@ -17,6 +17,12 @@ export class UsersController {
     @Query('limit') limit: number = QUERY.DEFAULT_LIMIT,
   ) {
     return this.usersService.paginate({ page, limit });
+  }
+
+  @Get('profile')
+  @UseGuards(JwtAuthGuard)
+  profile(@Req() request) {
+    return request.user || null ;
   }
 
   @Get(':id')
