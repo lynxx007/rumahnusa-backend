@@ -10,6 +10,7 @@ import { HttpExceptionMessages } from 'src/common/const/exceptions/message';
 import { JwtService } from '@nestjs/jwt';
 import { mapUserToJwtPayload, mapUserToAuthResponse } from 'src/mapper/users';
 import { AuthenticatedUserResponse } from 'src/common/const/types/auth';
+import { isEmpty } from 'src/common/helper';
 
 @Injectable()
 export class AuthenticationsService {
@@ -66,9 +67,7 @@ export class AuthenticationsService {
       .where('user.email = :email', { email: userEmail })
       .getOne();
     
-
-    // TODO: isEmpty helper
-    if (!user) throw new NotFoundException(HttpExceptionMessages.LOGIN_FAILED);
+    if (isEmpty(user)) throw new NotFoundException(HttpExceptionMessages.LOGIN_FAILED);
 
     return user;
   }

@@ -8,6 +8,7 @@ import { HttpExceptionMessages } from 'src/common/const/exceptions/message';
 import { CustomResponse } from 'src/common/const/types/response';
 import { HttpCustomMessages } from 'src/common/const/http/message';
 import { paginate, Pagination, IPaginationOptions } from 'nestjs-typeorm-paginate';
+import { isEmpty } from 'src/common/helper';
 
 @Injectable()
 export class PermissionsService {
@@ -15,7 +16,6 @@ export class PermissionsService {
   constructor(@InjectRepository(Permission) private permissionRepository: Repository<Permission>) {}
 
   async create(payload: CreatePermissionsPayload): Promise<Permission> {
-    //Todo: Admin Only
     try {
       return this.permissionRepository.save(payload);
     } catch (error) {
@@ -30,7 +30,7 @@ export class PermissionsService {
   async update(id: string, payload: UpdatePermissionsPayload): Promise<CustomResponse> {
     try {
       const permission: Permission = await this.permissionRepository.findOne({ where: { id } });
-      if (!permission) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
+      if (isEmpty(permission)) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
 
       const data: Partial<Permission> = { title: payload.title };
       await this.permissionRepository.update({ id }, data);
@@ -46,7 +46,7 @@ export class PermissionsService {
   async delete(id: string): Promise<CustomResponse> {
     try {
       const permission: Permission = await this.permissionRepository.findOneBy({ id });
-      if (!permission) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
+      if (isEmpty(permission)) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
 
       await this.permissionRepository.delete(id);
 

@@ -8,6 +8,7 @@ import { Role } from './role.entity';
 import { HttpExceptionMessages } from 'src/common/const/exceptions/message';
 import { CustomResponse } from 'src/common/const/types/response';
 import { HttpCustomMessages } from 'src/common/const/http/message';
+import { isEmpty } from 'src/common/helper';
 
 @Injectable()
 export class RolesService {
@@ -30,7 +31,7 @@ export class RolesService {
   async findOne(id: string): Promise<Role> {
     try {
       const role: Role = await this.roleRepository.findOne({ where: { id }, relations: ['users', 'permissions'] });
-      if (!role) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
+      if (isEmpty(role)) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
       return role;
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
@@ -42,7 +43,7 @@ export class RolesService {
     // TODO: update with permissions
     try {
       const role: Role = await this.roleRepository.findOne({ where: { id } });
-      if (!role) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
+      if (isEmpty(role)) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
 
       const data: Partial<Role> = {
         id,
@@ -64,7 +65,7 @@ export class RolesService {
     // TODO: delete with permission
     try {
       const role: Role = await this.roleRepository.findOne({ where: { id } });
-      if (!role) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
+      if (isEmpty(role)) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
       
       await this.roleRepository.softDelete(id);
       return new CustomResponse(HttpCustomMessages.DELETE_SUCCESS);

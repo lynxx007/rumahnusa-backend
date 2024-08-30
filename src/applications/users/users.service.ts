@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { CustomResponse } from 'src/common/const/types/response';
 import { Role } from '../roles/role.entity';
 import { paginate, Pagination, IPaginationOptions } from 'nestjs-typeorm-paginate';
+import { isEmpty } from 'src/common/helper';
 // Payloads
 import { CreateUsersPayload } from './payloads/createUsers.payload';
 import { UpdateUsersPayload } from './payloads/updateUsers.payload';
@@ -28,7 +29,7 @@ export class UsersService {
     try {
       const hashedPassword: string = await this.authService.hashPassword(payload.password);
       const role: Role = await this.roleRepository.findOne({ where: { id: payload.role_id } });
-      if (!role) throw new NotFoundException('Invalid role.');
+      if (isEmpty(role)) throw new NotFoundException('Invalid role.');
 
       const user = new User();
       user.email = payload.email;
@@ -51,7 +52,7 @@ export class UsersService {
 
   async update(payload: UpdateUsersPayload, id: string): Promise<CustomResponse> {
     const user: User = await this.userRepository.findOne({ where: { id } });
-    if (!user) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
+    if (isEmpty(user)) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
     try {
       
       const data: Partial<User> = {
@@ -74,7 +75,7 @@ export class UsersService {
   async destroy(id: string): Promise<CustomResponse> {
     try {
       const user: User = await this.userRepository.findOne({ where: { id } });
-      if (!user) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
+      if (isEmpty(user)) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
       await this.userRepository.softDelete(id);
       return new CustomResponse(HttpCustomMessages.DELETE_SUCCESS);
     } catch (error) {
@@ -87,7 +88,7 @@ export class UsersService {
   async findOne(id: string): Promise<CustomResponse> {
     try {
       const user: User = await this.userRepository.findOne({ where: { id } });
-      if (!user) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
+      if (isEmpty(user)) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
       return new CustomResponse(
         HttpCustomMessages.DEFAULT,
         'ok', 
