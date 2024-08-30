@@ -40,7 +40,6 @@ export class RolesService {
   }
 
   async update(id: string, payload: UpdateRolesPayload): Promise<CustomResponse> {
-    // TODO: update with permissions
     try {
       const role: Role = await this.roleRepository.findOne({ where: { id } });
       if (isEmpty(role)) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
@@ -62,7 +61,6 @@ export class RolesService {
   }
 
   async delete(id: string): Promise<CustomResponse> {
-    // TODO: delete with permission
     try {
       const role: Role = await this.roleRepository.findOne({ where: { id } });
       if (isEmpty(role)) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);

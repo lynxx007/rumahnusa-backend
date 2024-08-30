@@ -9,7 +9,6 @@ import { PermissionGuard } from '../authentications/strategy/permission.guard';
 
 @Controller('roles')
 export class RolesController {
-  // TODO: Admin only
   constructor(private readonly rolesService: RolesService) {}
 
   @Post()
