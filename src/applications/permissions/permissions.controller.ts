@@ -1,11 +1,12 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { PermissionsService } from './permissions.service';
+import { HTTP_QUERY_PARAMS } from 'src/const/http.const';
+
 import { CreatePermissionsPayload } from './payloads/createPermissions.payload';
 import { UpdatePermissionsPayload } from './payloads/updatePermission.payload';
-import { QUERY } from 'src/common/const/http/query_parameters';
 
-import { JwtAuthGuard } from '../authentications/strategy/jwt.guard';
-import { PermissionGuard } from '../authentications/strategy/permission.guard';
+import { JwtAuthGuard } from '../authentications/guards/jwt.guard';
+import { PermissionGuard } from '../authentications/guards/permission.guard';
 
 @Controller('permissions')
 export class PermissionsController {
@@ -20,8 +21,8 @@ export class PermissionsController {
   @Get()
   @UseGuards(JwtAuthGuard, new PermissionGuard('view permissions'))
   index(
-    @Query('page') page: number = QUERY.DEFAULT_PAGE,
-    @Query('limit') limit: number = QUERY.DEFAULT_LIMIT
+    @Query('page') page: number = HTTP_QUERY_PARAMS.DEFAULT_PAGE,
+    @Query('limit') limit: number = HTTP_QUERY_PARAMS.DEFAULT_LIMIT
   ) {
     return this.permissionsService.paginate({ page, limit });
   }

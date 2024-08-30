@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString } from 'class-validator';
-import { IsUnique } from 'src/common/decorators/IsUnique';
+import { IsUnique } from 'src/decorators/IsUnique';
 
 export class CreatePermissionsPayload {
     @IsNotEmpty()

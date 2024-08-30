@@ -1,8 +1,8 @@
 import { Controller, Post, HttpCode } from '@nestjs/common';
 import { AuthenticationsService } from './authentications.service';
-import { LoginPayload } from './payloads/loginPayload';
+import { LoginPayload } from './payloads/login.payload';
 import { Body } from '@nestjs/common';
-import { RegistrationPayload } from './payloads/registrationPayload';
+import { RegistrationPayload } from './payloads/register.payload';
 
 @Controller('auth')
 export class AuthenticationsController {

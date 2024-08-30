@@ -1,5 +1,5 @@
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
-import { IsUnique } from 'src/common/decorators/IsUnique';
+import { IsUnique } from 'src/decorators/IsUnique';
 
 import { Permission } from 'src/applications/permissions/permission.entity';
 

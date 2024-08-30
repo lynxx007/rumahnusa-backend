@@ -1,20 +1,18 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { HttpExceptionMessages } from 'src/common/const/exceptions/message';
-import { User } from './user.entity';
+
 import { Repository } from 'typeorm';
-import { CustomResponse } from 'src/common/const/types/response';
-import { Role } from '../roles/role.entity';
 import { paginate, Pagination, IPaginationOptions } from 'nestjs-typeorm-paginate';
-import { isEmpty } from 'src/common/helper';
-// Payloads
+
+import { isEmpty } from 'src/utilities/helper';
+import { HTTP_CUSTOM_MESSAGES } from 'src/const/http.const';
+import { HttpCustomResponse } from 'src/types/http.types';
 import { CreateUsersPayload } from './payloads/createUsers.payload';
 import { UpdateUsersPayload } from './payloads/updateUsers.payload';
-
-// Services
 import { AuthenticationsService } from '../authentications/authentications.service';
-import { HttpCustomMessages } from 'src/common/const/http/message';
 
+import { Role } from '../roles/role.entity';
+import { User } from './user.entity';
 @Injectable()
 export class UsersService {
   constructor(
@@ -50,9 +48,9 @@ export class UsersService {
     return await this.userRepository.find({ relations: ['role'] });
   }
 
-  async update(payload: UpdateUsersPayload, id: string): Promise<CustomResponse> {
+  async update(payload: UpdateUsersPayload, id: string): Promise<HttpCustomResponse> {
     const user: User = await this.userRepository.findOne({ where: { id } });
-    if (isEmpty(user)) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
+    if (isEmpty(user)) throw new NotFoundException(HTTP_CUSTOM_MESSAGES.NOT_FOUND);
     try {
       
       const data: Partial<User> = {
@@ -64,33 +62,33 @@ export class UsersService {
 
       await this.userRepository.update({ id }, data );  
 
-      return new CustomResponse(HttpCustomMessages.UPDATE_SUCCESS);
+      return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.UPDATE_SUCCESS);
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(HttpExceptionMessages.INTERNAL_SERVER);
+      throw new InternalServerErrorException(HTTP_CUSTOM_MESSAGES.INTERNAL_SERVER);
     }
     
   }
 
-  async destroy(id: string): Promise<CustomResponse> {
+  async destroy(id: string): Promise<HttpCustomResponse> {
     try {
       const user: User = await this.userRepository.findOne({ where: { id } });
-      if (isEmpty(user)) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
+      if (isEmpty(user)) throw new NotFoundException(HTTP_CUSTOM_MESSAGES.NOT_FOUND);
       await this.userRepository.softDelete(id);
-      return new CustomResponse(HttpCustomMessages.DELETE_SUCCESS);
+      return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.DELETE_SUCCESS);
     } catch (error) {
       // TODO: Create a custom error translator
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(HttpExceptionMessages.INTERNAL_SERVER);
+      throw new InternalServerErrorException(HTTP_CUSTOM_MESSAGES.INTERNAL_SERVER);
     }
   }
 
-  async findOne(id: string): Promise<CustomResponse> {
+  async findOne(id: string): Promise<HttpCustomResponse> {
     try {
       const user: User = await this.userRepository.findOne({ where: { id } });
-      if (isEmpty(user)) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
-      return new CustomResponse(
-        HttpCustomMessages.DEFAULT,
+      if (isEmpty(user)) throw new NotFoundException(HTTP_CUSTOM_MESSAGES.NOT_FOUND);
+      return new HttpCustomResponse(
+        HTTP_CUSTOM_MESSAGES.DEFAULT,
         'ok', 
         user
       );

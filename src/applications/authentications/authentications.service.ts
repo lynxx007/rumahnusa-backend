@@ -1,18 +1,23 @@
 import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import { SALT_ROUNDS } from 'src/config/security';
-import { User } from '../users/user.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { LoginPayload } from './payloads/loginPayload';
-import { RegistrationPayload } from './payloads/registrationPayload';
-import { HttpExceptionMessages } from 'src/common/const/exceptions/message';
 import { JwtService } from '@nestjs/jwt';
-import { mapUserToJwtPayload, mapUserToAuthResponse } from 'src/mapper/users';
-import { AuthenticatedUserResponse } from 'src/common/const/types/auth';
-import { isEmpty } from 'src/common/helper';
-import { DEFAULT_ROLE_NAME } from 'src/common/const';
+import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
+import { Repository } from 'typeorm';
+
+import { SALT_ROUNDS } from 'src/const/app.const';
+import { HTTP_CUSTOM_MESSAGES } from 'src/const/http.const';
+import { DEFAULT_ROLE_NAME } from 'src/const/app.const';
+
+import { mapUserToJwtPayload, mapUserToAuthResponse } from 'src/utilities/mapper/user.mapper';
+import { isEmpty } from 'src/utilities/helper';
+import { AuthenticatedUserResponse } from 'src/types/auth.types';
+
+
+import { LoginPayload } from './payloads/login.payload';
+import { RegistrationPayload } from './payloads/register.payload';
+
 import { Role } from '../roles/role.entity';
+import { User } from '../users/user.entity';
 
 @Injectable()
 export class AuthenticationsService {
@@ -39,14 +44,14 @@ export class AuthenticationsService {
     try {
       const user: User = await this._findAuthenticatedUser(payload.email);
       const isPasswordValid: boolean = await this.validatePassword(payload.password, user.password);
-      if (!isPasswordValid) throw new NotFoundException(HttpExceptionMessages.LOGIN_FAILED);
+      if (!isPasswordValid) throw new NotFoundException(HTTP_CUSTOM_MESSAGES.LOGIN_FAILED);
       
       // generate jwt token
       const jwtToken = this.jwtService.sign(mapUserToJwtPayload(user));
 
       return mapUserToAuthResponse(user, jwtToken); 
     } catch (err) {
-      throw new NotFoundException(HttpExceptionMessages.LOGIN_FAILED);
+      throw new NotFoundException(HTTP_CUSTOM_MESSAGES.LOGIN_FAILED);
     }
   }
 
@@ -77,7 +82,7 @@ export class AuthenticationsService {
       .where('user.email = :email', { email: userEmail })
       .getOne();
     
-    if (isEmpty(user)) throw new NotFoundException(HttpExceptionMessages.LOGIN_FAILED);
+    if (isEmpty(user)) throw new NotFoundException(HTTP_CUSTOM_MESSAGES.LOGIN_FAILED);
 
     return user;
   }

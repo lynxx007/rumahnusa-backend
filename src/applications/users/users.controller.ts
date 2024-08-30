@@ -2,9 +2,9 @@ import { Body, Controller, Post, Get, Put, Param, Delete, Query, UseGuards, Req 
 import { UsersService } from './users.service';
 import { CreateUsersPayload } from './payloads/createUsers.payload';
 import { UpdateUsersPayload } from './payloads/updateUsers.payload';
-import { QUERY } from 'src/common/const/http/query_parameters';
-import { JwtAuthGuard } from '../authentications/strategy/jwt.guard';
-import { PermissionGuard } from '../authentications/strategy/permission.guard';
+import { HTTP_QUERY_PARAMS } from 'src/const/http.const';
+import { JwtAuthGuard } from '../authentications/guards/jwt.guard';
+import { PermissionGuard } from '../authentications/guards/permission.guard';
 
 @Controller('users')
 export class UsersController {
@@ -13,8 +13,8 @@ export class UsersController {
   @Get()
   @UseGuards(JwtAuthGuard, new PermissionGuard('view users'))
   index(
-    @Query('page') page: number = QUERY.DEFAULT_PAGE,
-    @Query('limit') limit: number = QUERY.DEFAULT_LIMIT,
+    @Query('page') page: number = HTTP_QUERY_PARAMS.DEFAULT_PAGE,
+    @Query('limit') limit: number = HTTP_QUERY_PARAMS.DEFAULT_LIMIT,
   ) {
     return this.usersService.paginate({ page, limit });
   }

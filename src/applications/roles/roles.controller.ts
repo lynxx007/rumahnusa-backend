@@ -2,10 +2,10 @@ import { Controller, Get, Post, Body, Put, Param, Delete, Query, UseGuards } fro
 import { RolesService } from './roles.service';
 import { CreateRolesPayload } from './payloads/createRoles.payload';
 import { UpdateRolesPayload } from './payloads/updateRoles.payload';
-import { QUERY } from 'src/common/const/http/query_parameters';
+import { HTTP_QUERY_PARAMS } from 'src/const/http.const';
 
-import { JwtAuthGuard } from '../authentications/strategy/jwt.guard';
-import { PermissionGuard } from '../authentications/strategy/permission.guard';
+import { JwtAuthGuard } from '../authentications/guards/jwt.guard';
+import { PermissionGuard } from '../authentications/guards/permission.guard';
 
 @Controller('roles')
 export class RolesController {
@@ -20,8 +20,8 @@ export class RolesController {
   @Get()
   @UseGuards(JwtAuthGuard, new PermissionGuard('view roles'))
   index(
-    @Query('page') page: number = QUERY.DEFAULT_PAGE,
-    @Query('limit') limit: number = QUERY.DEFAULT_LIMIT,
+    @Query('page') page: number = HTTP_QUERY_PARAMS.DEFAULT_PAGE,
+    @Query('limit') limit: number = HTTP_QUERY_PARAMS.DEFAULT_LIMIT,
   ) {
     return this.rolesService.paginate({ page, limit });
   }

@@ -4,8 +4,8 @@ import {
   IsEmail,
   IsStrongPassword,
 } from 'class-validator';
-import { passwordValidationOption } from 'src/common/const/validation_options/passwordValidation';
-import { IsUnique } from 'src/common/decorators/IsUnique';
+import { PASSWORD_VALIDATION_OPTIONS } from 'src/const/options.const';
+import { IsUnique } from 'src/decorators/IsUnique';
 
 export class CreateUsersPayload {
   @IsNotEmpty()
@@ -22,7 +22,7 @@ export class CreateUsersPayload {
   readonly last_name: string;
 
   @IsNotEmpty()
-  @IsStrongPassword(passwordValidationOption)
+  @IsStrongPassword(PASSWORD_VALIDATION_OPTIONS)
   readonly password: string;
 
   @IsNotEmpty()

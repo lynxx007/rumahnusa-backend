@@ -1,15 +1,17 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { CreateRolesPayload } from './payloads/createRoles.payload';
-import { UpdateRolesPayload } from './payloads/updateRoles.payload';
 import { InjectRepository } from '@nestjs/typeorm';
+
 import { Repository } from 'typeorm';
 import { paginate, Pagination, IPaginationOptions } from 'nestjs-typeorm-paginate';
-import { Role } from './role.entity';
-import { HttpExceptionMessages } from 'src/common/const/exceptions/message';
-import { CustomResponse } from 'src/common/const/types/response';
-import { HttpCustomMessages } from 'src/common/const/http/message';
-import { isEmpty } from 'src/common/helper';
 
+import { HTTP_CUSTOM_MESSAGES } from 'src/const/http.const';
+import { HttpCustomResponse } from 'src/types/http.types';
+import { isEmpty } from 'src/utilities/helper';
+
+import { CreateRolesPayload } from './payloads/createRoles.payload';
+import { UpdateRolesPayload } from './payloads/updateRoles.payload';
+
+import { Role } from './role.entity';
 @Injectable()
 export class RolesService {
   constructor(
@@ -20,7 +22,7 @@ export class RolesService {
     try {
       return this.roleRepository.save(payload);
     } catch (error) {
-      throw new InternalServerErrorException(HttpExceptionMessages.INTERNAL_SERVER);
+      throw new InternalServerErrorException(HTTP_CUSTOM_MESSAGES.INTERNAL_SERVER);
     }
   }
 
@@ -31,18 +33,18 @@ export class RolesService {
   async findOne(id: string): Promise<Role> {
     try {
       const role: Role = await this.roleRepository.findOne({ where: { id }, relations: ['users', 'permissions'] });
-      if (isEmpty(role)) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
+      if (isEmpty(role)) throw new NotFoundException(HTTP_CUSTOM_MESSAGES.NOT_FOUND);
       return role;
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(HttpExceptionMessages.INTERNAL_SERVER);
+      throw new InternalServerErrorException(HTTP_CUSTOM_MESSAGES.INTERNAL_SERVER);
     }
   }
 
-  async update(id: string, payload: UpdateRolesPayload): Promise<CustomResponse> {
+  async update(id: string, payload: UpdateRolesPayload): Promise<HttpCustomResponse> {
     try {
       const role: Role = await this.roleRepository.findOne({ where: { id } });
-      if (isEmpty(role)) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
+      if (isEmpty(role)) throw new NotFoundException(HTTP_CUSTOM_MESSAGES.NOT_FOUND);
 
       const data: Partial<Role> = {
         id,
@@ -52,21 +54,21 @@ export class RolesService {
 
       const res = await this.roleRepository.save(data);
 
-      return new CustomResponse(HttpCustomMessages.UPDATE_SUCCESS, null, res); 
+      return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.UPDATE_SUCCESS, null, res); 
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(HttpExceptionMessages.INTERNAL_SERVER);
+      throw new InternalServerErrorException(HTTP_CUSTOM_MESSAGES.INTERNAL_SERVER);
     }
     
   }
 
-  async delete(id: string): Promise<CustomResponse> {
+  async delete(id: string): Promise<HttpCustomResponse> {
     try {
       const role: Role = await this.roleRepository.findOne({ where: { id } });
-      if (isEmpty(role)) throw new NotFoundException(HttpExceptionMessages.NOT_FOUND);
+      if (isEmpty(role)) throw new NotFoundException(HTTP_CUSTOM_MESSAGES.NOT_FOUND);
       
       await this.roleRepository.softDelete(id);
-      return new CustomResponse(HttpCustomMessages.DELETE_SUCCESS);
+      return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.DELETE_SUCCESS);
 
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
