@@ -1,5 +1,5 @@
 import { User } from 'src/applications/users/user.entity';
-import { AuthenticatedUser, AuthenticatedUserResponse } from 'src/common/const/types/auth';
+import { AuthenticatedUser, AuthenticatedUserResponse } from 'src/types/auth.types';
 
 export function mapUserToAuthResponse(user: Partial<User>, jwtToken: string | null ): AuthenticatedUserResponse {
   const mappedUser = mapUserToJwtPayload(user);
