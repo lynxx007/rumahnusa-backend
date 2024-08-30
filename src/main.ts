@@ -9,6 +9,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(
     new ClassSerializerInterceptor(app.get(Reflector))
   );
+  app.setGlobalPrefix('v1');
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   await app.listen(3000);
 }
