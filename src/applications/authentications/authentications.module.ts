@@ -9,9 +9,10 @@ import { PassportModule } from '@nestjs/passport';
 
 // Entities
 import { User } from '../users/user.entity';
+import { Role } from '../roles/role.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), JwtModule.register(JWT_OPTIONS), PassportModule],
+  imports: [TypeOrmModule.forFeature([User, Role]), JwtModule.register(JWT_OPTIONS), PassportModule],
   controllers: [AuthenticationsController],
   providers: [AuthenticationsService, AuthenticationStrategy],
   exports: [AuthenticationsService],

@@ -11,6 +11,8 @@ import { JwtService } from '@nestjs/jwt';
 import { mapUserToJwtPayload, mapUserToAuthResponse } from 'src/mapper/users';
 import { AuthenticatedUserResponse } from 'src/common/const/types/auth';
 import { isEmpty } from 'src/common/helper';
+import { DEFAULT_ROLE_NAME } from 'src/common/const';
+import { Role } from '../roles/role.entity';
 
 @Injectable()
 export class AuthenticationsService {
@@ -19,6 +21,8 @@ export class AuthenticationsService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Role)
+    private roleRepository: Repository<Role>,
     private jwtService: JwtService
   ) {}
 
@@ -48,14 +52,20 @@ export class AuthenticationsService {
 
   async validateRegistration(payload: RegistrationPayload): Promise<User> {
     try {
+
+      const role: Role = await this.roleRepository.findOneBy({ title: DEFAULT_ROLE_NAME });
+      if (isEmpty(role)) throw new NotFoundException('Default role doesn\'t exist.');
+
       const newUser = new User();
       newUser.email = payload.email;
       newUser.first_name = payload.first_name;
       newUser.last_name = payload.last_name;
       newUser.password = await this.hashPassword(payload.password);
+      newUser.role = role;
 
       return this.userRepository.save(newUser);
     } catch (error) {
+      if (error instanceof NotFoundException) throw error;
       throw new InternalServerErrorException('Something went wrong');
     }
   }
