@@ -50,6 +50,7 @@ export class SeederService {
       first_name: 'User Lezenda',
       last_name: 'Dev',
       email: 'user@lezenda.com',
+      phone_number: '085212345678',
       password: userPassword,
       role: userRole,
     });
@@ -58,6 +59,7 @@ export class SeederService {
       first_name: 'Admin Lezenda',
       last_name: 'Dev',
       email: 'admin@lezenda.com',
+      phone_number: '085312345678',
       password: adminPassword,
       role: adminRole,
     });
