@@ -101,9 +101,10 @@ export class UsersService {
     }
   }
 
-  async paginate(options: IPaginationOptions): Promise<Pagination<User>> {
+  async paginate(options: IPaginationOptions, userId: string): Promise<Pagination<User>> {
     const queryBuilder = this.userRepository.createQueryBuilder('user');
     queryBuilder
+      .where('user.id != :id', { id: userId })
       .leftJoinAndSelect('user.role', 'role')
       .orderBy('user.created_at', 'DESC');
 

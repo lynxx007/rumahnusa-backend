@@ -13,10 +13,12 @@ export class UsersController {
   @Get()
   @UseGuards(JwtAuthGuard, new PermissionGuard('view users'))
   index(
+    @Req() request,
     @Query('page') page: number = HTTP_QUERY_PARAMS.DEFAULT_PAGE,
     @Query('limit') limit: number = HTTP_QUERY_PARAMS.DEFAULT_LIMIT,
   ) {
-    return this.usersService.paginate({ page, limit });
+    const { id } = request.user;
+    return this.usersService.paginate({ page, limit }, id);
   }
 
   @Get('profile')
