@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MailerModule } from '@nestjs-modules/mailer';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 // Configurations
 import { DB_CONFIG } from 'src/database/config';
+import { MAILER_OPTIONS } from 'src/const/app.const';
 
 // Modules
 import { RolesModule } from './roles/roles.module';
@@ -20,6 +22,7 @@ import { IsUniqueConstraint } from 'src/rules/isUniqueConstraint';
 @Module({
   imports: [
     TypeOrmModule.forRoot(DB_CONFIG), 
+    MailerModule.forRoot(MAILER_OPTIONS),
     UsersModule, 
     AuthenticationsModule, 
     RolesModule, 

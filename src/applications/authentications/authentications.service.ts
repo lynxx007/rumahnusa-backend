@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
+import { MailerService } from '@nestjs-modules/mailer';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 
@@ -28,7 +29,8 @@ export class AuthenticationsService {
     private userRepository: Repository<User>,
     @InjectRepository(Role)
     private roleRepository: Repository<Role>,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private mailService: MailerService
   ) {}
 
   async hashPassword(password: string): Promise<string> {
@@ -68,6 +70,17 @@ export class AuthenticationsService {
       newUser.phone_number = payload.phone_number;
       newUser.password = await this.hashPassword(payload.password);
       newUser.role = role;
+
+      await this.mailService.sendMail({
+        to: 'mycodingpersona@gmail.com',
+        from: 'noreply@lezenda.com',
+        subject: 'Testing Nest Mailermodule with template ✔',
+        template: './welcome', // The `.pug`, `.ejs` or `.hbs` extension is appended automatically.
+        context: {
+          // Data to be sent to template engine.
+          name: newUser.first_name,
+        },
+      });
 
       return this.userRepository.save(newUser);
     } catch (error) {
