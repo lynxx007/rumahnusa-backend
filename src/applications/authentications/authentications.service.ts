@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
@@ -9,7 +9,7 @@ import { HTTP_CUSTOM_MESSAGES } from 'src/const/http.const';
 import { DEFAULT_ROLE_NAME } from 'src/const/app.const';
 
 import { mapUserToJwtPayload, mapUserToAuthResponse } from 'src/utilities/mapper/user.mapper';
-import { isEmpty } from 'src/utilities/helper';
+import { handleHttpError, isEmpty } from 'src/utilities/helper';
 import { AuthenticatedUserResponse } from 'src/types/auth.types';
 
 
@@ -71,8 +71,7 @@ export class AuthenticationsService {
 
       return this.userRepository.save(newUser);
     } catch (error) {
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException('Something went wrong');
+      handleHttpError(error);
     }
   }
 

@@ -1,10 +1,10 @@
-import { Injectable, InternalServerErrorException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { Repository } from 'typeorm';
 import { paginate, Pagination, IPaginationOptions } from 'nestjs-typeorm-paginate';
 
-import { isEmpty } from 'src/utilities/helper';
+import { handleHttpError, isEmpty } from 'src/utilities/helper';
 import { HTTP_CUSTOM_MESSAGES } from 'src/const/http.const';
 import { HttpCustomResponse } from 'src/types/http.types';
 import { CreateUsersPayload } from './payloads/createUsers.payload';
@@ -39,13 +39,11 @@ export class UsersService {
 
       return this.userRepository.save(user);
     } catch (error) {
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(error.message);
+      handleHttpError(error);
     }
   }
 
   async findAll(): Promise<User[]> {
-    // TODO: Exclude currently logged in user in the response
     return await this.userRepository.find({ relations: ['role'] });
   }
 
@@ -67,8 +65,7 @@ export class UsersService {
 
       return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.UPDATE_SUCCESS);
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof UnprocessableEntityException) throw error;
-      throw new InternalServerErrorException(HTTP_CUSTOM_MESSAGES.INTERNAL_SERVER);
+      handleHttpError(error);
     }
     
   }
@@ -80,9 +77,7 @@ export class UsersService {
       await this.userRepository.softDelete(id);
       return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.DELETE_SUCCESS);
     } catch (error) {
-      // TODO: Create a custom error translator
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(HTTP_CUSTOM_MESSAGES.INTERNAL_SERVER);
+      handleHttpError(error);
     }
   }
 
@@ -96,8 +91,7 @@ export class UsersService {
         user
       );
     } catch (error) {
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(error.message);
+      handleHttpError(error);
     }
   }
 

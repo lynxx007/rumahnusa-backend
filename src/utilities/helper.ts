@@ -1,3 +1,5 @@
+import { InternalServerErrorException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+
 export function isEmpty(data: any): boolean {
   if (data === null || data === undefined) {
     return true;
@@ -19,4 +21,10 @@ export function isEmpty(data: any): boolean {
   }
 
   return false;
+}
+
+export function handleHttpError(error: any) {
+  if (error instanceof NotFoundException || error instanceof UnprocessableEntityException) throw error;
+
+  throw new InternalServerErrorException(error?.message);
 }

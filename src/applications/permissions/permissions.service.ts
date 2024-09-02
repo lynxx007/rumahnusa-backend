@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Permission } from './permission.entity';
@@ -10,7 +10,7 @@ import { UpdatePermissionsPayload } from './payloads/updatePermission.payload';
 import { HTTP_CUSTOM_MESSAGES } from 'src/const/http.const';
 import { HttpCustomResponse } from 'src/types/http.types';
 
-import { isEmpty } from 'src/utilities/helper';
+import { handleHttpError, isEmpty } from 'src/utilities/helper';
 
 @Injectable()
 export class PermissionsService {
@@ -21,7 +21,7 @@ export class PermissionsService {
     try {
       return this.permissionRepository.save(payload);
     } catch (error) {
-      throw new InternalServerErrorException(HTTP_CUSTOM_MESSAGES.INTERNAL_SERVER);
+      handleHttpError(error);
     }
   }
 
@@ -40,8 +40,7 @@ export class PermissionsService {
       return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.UPDATE_SUCCESS);
 
     } catch (error) {
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(HTTP_CUSTOM_MESSAGES.INTERNAL_SERVER);
+      handleHttpError(error);
     }
   }
 
@@ -54,8 +53,7 @@ export class PermissionsService {
 
       return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.DELETE_SUCCESS);
     } catch (error) {
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(error.message);
+      handleHttpError(error);
     }
   }
 

@@ -6,7 +6,7 @@ import { paginate, Pagination, IPaginationOptions } from 'nestjs-typeorm-paginat
 
 import { HTTP_CUSTOM_MESSAGES } from 'src/const/http.const';
 import { HttpCustomResponse } from 'src/types/http.types';
-import { isEmpty } from 'src/utilities/helper';
+import { handleHttpError, isEmpty } from 'src/utilities/helper';
 
 import { CreateRolesPayload } from './payloads/createRoles.payload';
 import { UpdateRolesPayload } from './payloads/updateRoles.payload';
@@ -36,8 +36,7 @@ export class RolesService {
       if (isEmpty(role)) throw new NotFoundException(HTTP_CUSTOM_MESSAGES.NOT_FOUND);
       return role;
     } catch (error) {
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(HTTP_CUSTOM_MESSAGES.INTERNAL_SERVER);
+      handleHttpError(error);
     }
   }
 
@@ -56,8 +55,7 @@ export class RolesService {
 
       return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.UPDATE_SUCCESS, null, res); 
     } catch (error) {
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(HTTP_CUSTOM_MESSAGES.INTERNAL_SERVER);
+      handleHttpError(error);
     }
     
   }
@@ -71,8 +69,7 @@ export class RolesService {
       return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.DELETE_SUCCESS);
 
     } catch (error) {
-      if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(error.message);
+      handleHttpError(error);
     }
   }
 
