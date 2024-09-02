@@ -22,6 +22,10 @@ export class CreateUsersPayload {
   readonly last_name: string;
 
   @IsNotEmpty()
+  @IsUnique({ tableName: 'users', column: 'phone_number' })
+  readonly phone_number: string;
+
+  @IsNotEmpty()
   @IsStrongPassword(PASSWORD_VALIDATION_OPTIONS)
   readonly password: string;
 

@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { Repository } from 'typeorm';
@@ -34,6 +34,7 @@ export class UsersService {
       user.password = hashedPassword;
       user.first_name = payload.first_name;
       user.last_name = payload.last_name;
+      user.phone_number = payload.phone_number;
       user.role = role;
 
       return this.userRepository.save(user);
@@ -55,16 +56,18 @@ export class UsersService {
       
       const data: Partial<User> = {
         email: payload.email,
+        phone_number: payload.phone_number,
         password: payload.password ? await this.authService.hashPassword(payload.password) : user.password,
         first_name: payload.first_name,
         last_name: payload.last_name,
       };
 
+      await this._validateUpdate(id, data);
       await this.userRepository.update({ id }, data );  
 
       return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.UPDATE_SUCCESS);
     } catch (error) {
-      if (error instanceof NotFoundException) throw error;
+      if (error instanceof NotFoundException || error instanceof UnprocessableEntityException) throw error;
       throw new InternalServerErrorException(HTTP_CUSTOM_MESSAGES.INTERNAL_SERVER);
     }
     
@@ -105,5 +108,20 @@ export class UsersService {
       .orderBy('user.created_at', 'DESC');
 
     return paginate<User>(queryBuilder, options);
+  }
+
+  async _validateUpdate(id: string, data: Partial<User>): Promise<void> {
+    const user = await this.userRepository.createQueryBuilder('user')
+      .where(
+        '(user.email = :email AND user.id != :id) OR (user.phone_number = :phone_number AND user.id != :id)',
+        {
+          email: data.email,
+          phone_number: data.phone_number,
+          id: id,
+        }
+      )
+      .getOne();
+
+    if (user) throw new UnprocessableEntityException(HTTP_CUSTOM_MESSAGES.UNPROCESSABLE_ENTITY);
   }
 }

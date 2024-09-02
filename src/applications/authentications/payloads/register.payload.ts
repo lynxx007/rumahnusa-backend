@@ -28,6 +28,10 @@ export class RegistrationPayload {
     readonly password: string;
 
     @IsNotEmpty()
+    @IsUnique({ tableName: 'users', column: 'phone_number' })
+    readonly phone_number: string;
+
+    @IsNotEmpty()
     @IsIn([Math.random()], {
       message: 'Passwords do not match',
     })

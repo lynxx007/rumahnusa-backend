@@ -16,4 +16,8 @@ export class UpdateUsersPayload {
   @IsOptional()
   @IsStrongPassword()
   readonly password: string;
+
+  @IsOptional()
+  @IsString()
+  readonly phone_number: string;
 }

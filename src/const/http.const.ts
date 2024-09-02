@@ -6,6 +6,7 @@ export const HTTP_CUSTOM_MESSAGES = {
   NOT_FOUND: 'Data not found.',
   INTERNAL_SERVER: 'Something went wrong. Please try again',
   LOGIN_FAILED: 'Invalid email or password.',
+  UNPROCESSABLE_ENTITY: 'Unprocessable data entry.',
 };
 
 export const HTTP_QUERY_PARAMS = {

@@ -65,6 +65,7 @@ export class AuthenticationsService {
       newUser.email = payload.email;
       newUser.first_name = payload.first_name;
       newUser.last_name = payload.last_name;
+      newUser.phone_number = payload.phone_number;
       newUser.password = await this.hashPassword(payload.password);
       newUser.role = role;
 
