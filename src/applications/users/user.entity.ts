@@ -26,6 +26,9 @@ export class User {
   @Column('varchar')
     email: string;
 
+  @Column('varchar')
+    phone_number: string;
+
   @Exclude({ toPlainOnly: true })
   @Column('varchar')
     password: string;
