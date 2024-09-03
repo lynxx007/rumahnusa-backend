@@ -39,3 +39,8 @@ export function getOtpExpirationTime(): Date {
   now.setHours(now.getHours() + EMAIL_VERIFICATION_EXPIRATION_IN_HOURS);
   return now;
 }
+
+export function dateHasPassed(inputDate: Date): boolean {
+  const now = new Date();
+  return inputDate < now;
+}

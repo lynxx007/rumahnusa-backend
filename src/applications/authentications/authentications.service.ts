@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MailerService } from '@nestjs-modules/mailer';
@@ -12,8 +12,9 @@ import { VerificationCodeMailContext, WelcomeMailContext } from 'src/mail/interf
 import { WELCOME_EMAIL_SUBJECT, EMAIL_VERIFICATION_SUBJECT } from 'src/const/mail.const';
 
 import { mapUserToJwtPayload, mapUserToAuthResponse } from 'src/utilities/mapper/user.mapper';
-import { handleHttpError, isEmpty, generateOtp, getOtpExpirationTime } from 'src/utilities/helper';
+import { handleHttpError, isEmpty, generateOtp, getOtpExpirationTime, dateHasPassed } from 'src/utilities/helper';
 import { AuthenticatedUserResponse } from 'src/types/auth.types';
+import { HttpCustomResponse } from 'src/types/http.types';
 
 
 import { LoginPayload } from './payloads/login.payload';
@@ -22,6 +23,7 @@ import { RegistrationPayload } from './payloads/register.payload';
 import { Role } from '../roles/role.entity';
 import { User } from '../users/user.entity';
 import MailPayload from 'src/mail/entities';
+import { EmailVerificationPayload } from './payloads/verification.payload';
 
 @Injectable()
 export class AuthenticationsService {
@@ -81,6 +83,27 @@ export class AuthenticationsService {
       this._sendVerificationEmail(newUser, { name: newUser.first_name, otp: newUser.verification_code });
 
       return this.userRepository.save(newUser);
+      // TODO: Return JWT Token as well
+    } catch (error) {
+      handleHttpError(error);
+    }
+  }
+
+  async verifyEmail(payload: EmailVerificationPayload): Promise<HttpCustomResponse> {
+    try {
+      const user: User = await this.userRepository.findOneBy({ email: payload.email });
+
+      if (isEmpty(user)) throw new NotFoundException('Email not valid.');
+
+      if (dateHasPassed(user.verification_exp_date)) throw new UnprocessableEntityException('Expired OTP code.');
+
+      if (user.verification_code != payload.otp) throw new UnprocessableEntityException('Invalid OTP code.');
+
+      await this.userRepository.update({ id: user.id }, { verification_code: null, verification_exp_date: null });
+      const token: string = await this.jwtService.sign(mapUserToJwtPayload(user));
+
+      return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.CREATE_SUCCESS, 'Ok', mapUserToAuthResponse(user, token));
+      
     } catch (error) {
       handleHttpError(error);
     }

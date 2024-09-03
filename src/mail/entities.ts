@@ -17,7 +17,7 @@ class MailPayload implements ISendMailOptions{
     template: string,
     data: WelcomeMailContext | VerificationCodeMailContext | ResetPasswordMailContext,
   ) {
-    this.to = 'mycodingpersona@gmail.com';
+    this.to = user.email;
     this.name = user.first_name;
     this.subject = subject;
     this.template = template;
