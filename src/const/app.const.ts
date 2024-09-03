@@ -10,6 +10,7 @@ export const JWT_SECRET = process.env.JWT_SECRET || 'LZ-STARTER';
 export const APP_PORT: number = (process.env.PORT as unknown as number) || 8000;
 export const DEFAULT_ROLE_NAME = process.env.DEFAULT_ROLE_NAME || 'User';
 export const APP_NAME: string = process.env.APP_NAME || 'Lezenda';
+export const EMAIL_VERIFICATION_EXPIRATION_IN_HOURS: number = Number(process.env.EMAIL_VERIFICATION_EXPIRATION_IN_HOURS);
 
 export const MAIL_HOST = process.env.MAIL_HOST;
 export const MAIL_PORT = Number(process.env.MAIL_PORT);

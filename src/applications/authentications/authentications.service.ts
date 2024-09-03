@@ -8,11 +8,11 @@ import { Repository } from 'typeorm';
 import { SALT_ROUNDS } from 'src/const/app.const';
 import { HTTP_CUSTOM_MESSAGES } from 'src/const/http.const';
 import { DEFAULT_ROLE_NAME } from 'src/const/app.const';
-import { WelcomeMailContext } from 'src/mail/interfaces';
-import { WELCOME_EMAIL_SUBJECT } from 'src/const/mail.const';
+import { VerificationCodeMailContext, WelcomeMailContext } from 'src/mail/interfaces';
+import { WELCOME_EMAIL_SUBJECT, EMAIL_VERIFICATION_SUBJECT } from 'src/const/mail.const';
 
 import { mapUserToJwtPayload, mapUserToAuthResponse } from 'src/utilities/mapper/user.mapper';
-import { handleHttpError, isEmpty } from 'src/utilities/helper';
+import { handleHttpError, isEmpty, generateOtp, getOtpExpirationTime } from 'src/utilities/helper';
 import { AuthenticatedUserResponse } from 'src/types/auth.types';
 
 
@@ -73,8 +73,11 @@ export class AuthenticationsService {
       newUser.phone_number = payload.phone_number;
       newUser.password = await this.hashPassword(payload.password);
       newUser.role = role;
+      newUser.verification_code = generateOtp();
+      newUser.verification_exp_date = getOtpExpirationTime();
 
       this._sendWelcomeEmail(newUser, { name: newUser.first_name });
+      this._sendVerificationEmail(newUser, { name: newUser.first_name, otp: newUser.verification_code });
 
       return this.userRepository.save(newUser);
     } catch (error) {
@@ -98,6 +101,13 @@ export class AuthenticationsService {
     const mailTemplate: string = './welcome';
     const mailSubject: string = WELCOME_EMAIL_SUBJECT;
     const mailPayload: MailPayload = new MailPayload(user, mailSubject, mailTemplate, data );
+    await this.mailService.sendMail(mailPayload);
+  }
+
+  async _sendVerificationEmail(user: User, data: VerificationCodeMailContext) {
+    const mailTemplate: string = './verify-email';
+    const mailSubject: string = EMAIL_VERIFICATION_SUBJECT;
+    const mailPayload: MailPayload = new MailPayload(user, mailSubject, mailTemplate, data);
     await this.mailService.sendMail(mailPayload);
   }
 }
