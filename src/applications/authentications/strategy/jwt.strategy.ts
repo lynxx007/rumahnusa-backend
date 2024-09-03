@@ -19,8 +19,11 @@ export class AuthenticationStrategy extends PassportStrategy(Strategy) {
       id: payload.id,
       email: payload.email,
       first_name: payload.first_name,
+      last_name: payload.last_name,
+      phone_number: payload.phone_number,
       role: payload.role,
       permissions: payload.permissions,
+      is_verified: payload.is_verified,
     };
   }
 }

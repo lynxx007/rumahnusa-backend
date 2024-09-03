@@ -15,7 +15,10 @@ export function mapUserToJwtPayload(user: Partial<User>): AuthenticatedUser {
     id: user.id,
     email: user.email,
     first_name: user.first_name,
+    last_name: user.last_name,
+    phone_number: user.phone_number,
     role: user.role?.title,
     permissions: userPermission,
+    is_verified: user.is_verified,
   };
 }

@@ -75,6 +75,7 @@ export class AuthenticationsService {
       newUser.role = role;
       newUser.verification_code = generateOtp();
       newUser.verification_exp_date = getOtpExpirationTime();
+      newUser.is_verified = false;
 
       this._sendWelcomeEmail(newUser, { name: newUser.first_name });
       this._sendVerificationEmail(newUser, { name: newUser.first_name, otp: newUser.verification_code });

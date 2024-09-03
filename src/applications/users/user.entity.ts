@@ -32,8 +32,11 @@ export class User {
   @Column({ type: 'varchar', nullable: true, default: null })
     verification_code: string | null;
   
-  @Column({ type: 'date', nullable: true, default: null })
+  @Column({ type: 'timestamp', nullable: true, default: null })
     verification_exp_date: Date | null;
+
+  @Column({ type: 'boolean', default: true })
+    is_verified: boolean;
 
   @Exclude({ toPlainOnly: true })
   @Column('varchar')
