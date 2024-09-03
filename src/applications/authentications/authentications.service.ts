@@ -24,6 +24,7 @@ import { Role } from '../roles/role.entity';
 import { User } from '../users/user.entity';
 import MailPayload from 'src/mail/entities';
 import { EmailVerificationPayload } from './payloads/verification.payload';
+import { ResendEmailVerificationPayload } from './payloads/resend-verification.payload';
 
 @Injectable()
 export class AuthenticationsService {
@@ -107,6 +108,23 @@ export class AuthenticationsService {
     } catch (error) {
       handleHttpError(error);
     }
+  }
+
+  async resendVerificationEmail(payload: ResendEmailVerificationPayload): Promise<HttpCustomResponse> {
+    
+    const user: User = await this.userRepository.findOneBy({ email: payload.email });
+
+    if (isEmpty(user)) throw new NotFoundException('Email not valid.');
+
+    const verificationData: Partial<User> = { 
+      verification_code: generateOtp(), 
+      verification_exp_date: getOtpExpirationTime(),
+    };
+
+    await this.userRepository.update({ email: user.email }, verificationData);
+    this._sendVerificationEmail(user, { name: user.first_name, otp: verificationData.verification_code });
+
+    return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.DEFAULT, 'Ok');
   }
 
   async _findAuthenticatedUser(userEmail: string): Promise<User> {
