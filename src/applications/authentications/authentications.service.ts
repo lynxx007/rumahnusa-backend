@@ -8,6 +8,8 @@ import { Repository } from 'typeorm';
 import { SALT_ROUNDS } from 'src/const/app.const';
 import { HTTP_CUSTOM_MESSAGES } from 'src/const/http.const';
 import { DEFAULT_ROLE_NAME } from 'src/const/app.const';
+import { WelcomeMailContext } from 'src/mail/interfaces';
+import { WELCOME_EMAIL_SUBJECT } from 'src/const/mail.const';
 
 import { mapUserToJwtPayload, mapUserToAuthResponse } from 'src/utilities/mapper/user.mapper';
 import { handleHttpError, isEmpty } from 'src/utilities/helper';
@@ -19,6 +21,7 @@ import { RegistrationPayload } from './payloads/register.payload';
 
 import { Role } from '../roles/role.entity';
 import { User } from '../users/user.entity';
+import MailPayload from 'src/mail/entities';
 
 @Injectable()
 export class AuthenticationsService {
@@ -71,16 +74,7 @@ export class AuthenticationsService {
       newUser.password = await this.hashPassword(payload.password);
       newUser.role = role;
 
-      await this.mailService.sendMail({
-        to: 'mycodingpersona@gmail.com',
-        from: 'noreply@lezenda.com',
-        subject: 'Testing Nest Mailermodule with template ✔',
-        template: './welcome', // The `.pug`, `.ejs` or `.hbs` extension is appended automatically.
-        context: {
-          // Data to be sent to template engine.
-          name: newUser.first_name,
-        },
-      });
+      this._sendWelcomeEmail(newUser, { name: newUser.first_name });
 
       return this.userRepository.save(newUser);
     } catch (error) {
@@ -98,5 +92,12 @@ export class AuthenticationsService {
     if (isEmpty(user)) throw new NotFoundException(HTTP_CUSTOM_MESSAGES.LOGIN_FAILED);
 
     return user;
+  }
+
+  async _sendWelcomeEmail(user: User, data: WelcomeMailContext) {
+    const mailTemplate: string = './welcome';
+    const mailSubject: string = WELCOME_EMAIL_SUBJECT;
+    const mailPayload: MailPayload = new MailPayload(user, mailSubject, mailTemplate, data );
+    await this.mailService.sendMail(mailPayload);
   }
 }

@@ -24,7 +24,7 @@
                   href="https://example.com"
                   class="f-fallback email-masthead_name"
                 >
-                  Welcome to company
+                  Welcome to <%= locals.appName %>
                 </a>
               </td>
             </tr>
@@ -50,7 +50,7 @@
                       <div class="f-fallback">
                         <h1>Welcome, <%= locals.name %>!</h1>
                         <p>
-                          Thanks for trying company. We’re thrilled to have you
+                          Thanks for trying <%= locals.appName %>. We’re thrilled to have you
                           on board.
                         </p>
 
@@ -64,7 +64,7 @@
                           >
                           during business hours.
                         </p>
-                        <p>Thanks, <br />company team</p>
+                        <p>Thanks, <br /><%= locals.appName %> team</p>
                         <p>
                           <strong>P.S.</strong> Need immediate help getting
                           started? Check out our
@@ -72,7 +72,7 @@
                             >help documentation</a
                           >. Or, just reply to this
                           <a href="mailto:support@company.com">email</a>, the
-                          company support team is always ready to help!
+                          <%= locals.appName %> support team is always ready to help!
                         </p>
                       </div>
                     </td>

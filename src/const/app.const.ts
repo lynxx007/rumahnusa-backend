@@ -9,11 +9,13 @@ export const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS, 10) || 5;
 export const JWT_SECRET = process.env.JWT_SECRET || 'LZ-STARTER';
 export const APP_PORT: number = (process.env.PORT as unknown as number) || 8000;
 export const DEFAULT_ROLE_NAME = process.env.DEFAULT_ROLE_NAME || 'User';
+export const APP_NAME: string = process.env.APP_NAME || 'Lezenda';
 
 export const MAIL_HOST = process.env.MAIL_HOST;
 export const MAIL_PORT = Number(process.env.MAIL_PORT);
 export const MAIL_USERNAME = process.env.MAIL_USERNAME;
 export const MAIL_PASSWORD = process.env.MAIL_PASSWORD;
+export const MAIL_FROM = process.env.MAIL_FROM;
 
 
 export const JWT_OPTIONS: JwtModuleOptions = {
@@ -34,7 +36,7 @@ export const MAILER_OPTIONS: MailerOptions = {
     },
   },
   defaults: {
-    from: 'noreply@lezenda.com',
+    from: `"${APP_NAME}" <${MAIL_FROM}>`,
   },
   template: {
     dir: join(__dirname, '..','mail', 'templates'),
