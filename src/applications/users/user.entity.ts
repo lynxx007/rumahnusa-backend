@@ -29,12 +29,15 @@ export class User {
   @Column('varchar')
     phone_number: string;
 
+  @Exclude({ toPlainOnly: true }) 
   @Column({ type: 'varchar', nullable: true, default: null })
     verification_code: string | null;
   
+  @Exclude({ toPlainOnly: true })   
   @Column({ type: 'timestamp', nullable: true, default: null })
     verification_exp_date: Date | null;
 
+  @Exclude({ toPlainOnly: true }) 
   @Column({ type: 'boolean', default: true })
     is_verified: boolean;
 
