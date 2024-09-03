@@ -13,6 +13,7 @@ import { AuthenticationsService } from '../authentications/authentications.servi
 
 import { Role } from '../roles/role.entity';
 import { User } from './user.entity';
+import { ChangePasswordPayload } from './payloads/changePassword.payload';
 @Injectable()
 export class UsersService {
   constructor(
@@ -118,5 +119,22 @@ export class UsersService {
       .getOne();
 
     if (user) throw new UnprocessableEntityException(HTTP_CUSTOM_MESSAGES.UNPROCESSABLE_ENTITY);
+  }
+
+  async changePassword(userContext: any, payload: ChangePasswordPayload): Promise<HttpCustomResponse> {
+    try {
+      const user: User = await this.userRepository.findOneBy({ id: userContext.id });
+      const isCurrentPasswordCorrect = await this.authService.validatePassword(payload.current_password, user.password);
+  
+      if (!isCurrentPasswordCorrect) throw new UnprocessableEntityException('Invalid current password.'); 
+
+      const hashedPassword: string = await this.authService.hashPassword(payload.password);
+
+      await this.userRepository.update({ id: user.id }, { password: hashedPassword });
+
+      return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.UPDATE_SUCCESS, 'Success');
+    } catch (error) {
+      handleHttpError(error);
+    }
   }
 }

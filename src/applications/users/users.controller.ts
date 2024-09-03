@@ -5,6 +5,7 @@ import { UpdateUsersPayload } from './payloads/updateUsers.payload';
 import { HTTP_QUERY_PARAMS } from 'src/const/http.const';
 import { JwtAuthGuard } from '../authentications/guards/jwt.guard';
 import { PermissionGuard } from '../authentications/guards/permission.guard';
+import { ChangePasswordPayload } from './payloads/changePassword.payload';
 
 @Controller('users')
 export class UsersController {
@@ -26,6 +27,12 @@ export class UsersController {
   profile(@Req() request) {
     return request.user || null ;
   }
+
+  @Put('change-password')
+  @UseGuards(JwtAuthGuard)
+  changePassword(@Req() request, @Body() payload: ChangePasswordPayload){
+    return this.usersService.changePassword(request.user, payload);
+  } 
 
   @Get(':id')
   @UseGuards(JwtAuthGuard, new PermissionGuard('view users'))
