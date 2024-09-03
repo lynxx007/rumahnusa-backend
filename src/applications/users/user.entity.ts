@@ -29,6 +29,12 @@ export class User {
   @Column('varchar')
     phone_number: string;
 
+  @Column({ type: 'varchar', nullable: true, default: null })
+    verification_code: string | null;
+  
+  @Column({ type: 'date', nullable: true, default: null })
+    verification_exp_date: Date | null;
+
   @Exclude({ toPlainOnly: true })
   @Column('varchar')
     password: string;
