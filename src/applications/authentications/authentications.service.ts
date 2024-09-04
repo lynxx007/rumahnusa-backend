@@ -100,7 +100,7 @@ export class AuthenticationsService {
 
       if (user.verification_code != payload.otp) throw new UnprocessableEntityException('Invalid OTP code.');
 
-      await this.userRepository.update({ id: user.id }, { verification_code: null, verification_exp_date: null });
+      await this.userRepository.update({ id: user.id }, { verification_code: null, verification_exp_date: null, is_verified: true });
       const token: string = await this.jwtService.sign(mapUserToJwtPayload(user));
 
       return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.CREATE_SUCCESS, 'Ok', mapUserToAuthResponse(user, token));
