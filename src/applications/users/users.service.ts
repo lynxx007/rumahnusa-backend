@@ -151,8 +151,10 @@ export class UsersService {
       };
 
       await this.userRepository.update({ id: userContext.id }, data);
+      const user: User = await this.userRepository.findOneBy({ id: userContext.id });
+      const jwtToken: string = this.authService._generateJwtToken(user);
 
-      return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.UPDATE_SUCCESS, 'Success');
+      return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.UPDATE_SUCCESS, 'Success', { token: jwtToken });
     } catch (error) {
       handleHttpError(error);
     }

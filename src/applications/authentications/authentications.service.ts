@@ -55,7 +55,7 @@ export class AuthenticationsService {
       if (!isPasswordValid) throw new NotFoundException(HTTP_CUSTOM_MESSAGES.LOGIN_FAILED);
       
       // generate jwt token
-      const jwtToken = this.jwtService.sign(mapUserToJwtPayload(user));
+      const jwtToken = this._generateJwtToken(user);
 
       return mapUserToAuthResponse(user, jwtToken); 
     } catch (err) {
@@ -151,5 +151,9 @@ export class AuthenticationsService {
     const mailSubject: string = EMAIL_VERIFICATION_SUBJECT;
     const mailPayload: MailPayload = new MailPayload(user, mailSubject, mailTemplate, data);
     await this.mailService.sendMail(mailPayload);
+  }
+
+  _generateJwtToken(user: User): string {
+    return this.jwtService.sign(mapUserToJwtPayload(user)); 
   }
 }
