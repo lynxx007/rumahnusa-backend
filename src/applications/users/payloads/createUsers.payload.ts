@@ -31,4 +31,6 @@ export class CreateUsersPayload {
 
   @IsNotEmpty()
   readonly role_id: string;
+
+  profile_picture: string | null;
 }

@@ -20,4 +20,6 @@ export class UpdateUsersPayload {
   @IsOptional()
   @IsString()
   readonly phone_number: string;
+
+  profile_picture: string | null;
 }

@@ -1,4 +1,6 @@
-import { Body, Controller, Post, Get, Put, Param, Delete, Query, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Post, Get, Put, Param, Delete, Query, UseGuards, Req, ParseFilePipeBuilder, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerConfig } from 'src/const/storage.const';
 import { UsersService } from './users.service';
 import { CreateUsersPayload } from './payloads/createUsers.payload';
 import { UpdateUsersPayload } from './payloads/updateUsers.payload';
@@ -6,6 +8,7 @@ import { HTTP_QUERY_PARAMS } from 'src/const/http.const';
 import { JwtAuthGuard } from '../authentications/guards/jwt.guard';
 import { PermissionGuard } from '../authentications/guards/permission.guard';
 import { ChangePasswordPayload } from './payloads/changePassword.payload';
+import { UpdateProfilePayload } from './payloads/updateProfile.payload';
 
 @Controller('users')
 export class UsersController {
@@ -28,6 +31,30 @@ export class UsersController {
     return request.user || null ;
   }
 
+
+  @Put('profile')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('image', multerConfig))
+  updateProfile(
+    @Req() request,
+    @Body() payload: UpdateProfilePayload,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: /(jpg|jpeg|png)$/,
+        })
+        .addMaxSizeValidator({
+          maxSize: 1024 * 1024 * 5,
+        })
+        .build({
+          fileIsRequired: false,
+          errorHttpStatusCode: 422,
+        })
+    ) image: Express.Multer.File
+  ) {
+    return this.usersService.updateProfile(request.user, { ...payload, profile_picture: image?.path });
+  }
+
   @Put('change-password')
   @UseGuards(JwtAuthGuard)
   changePassword(@Req() request, @Body() payload: ChangePasswordPayload){
@@ -41,15 +68,48 @@ export class UsersController {
   }
 
   @Post()
+  @UseInterceptors(FileInterceptor('image', multerConfig))
   @UseGuards(JwtAuthGuard, new PermissionGuard('create users'))
-  create(@Body() payload: CreateUsersPayload) {
-    return this.usersService.create(payload);
+  create(
+    @Body() payload: CreateUsersPayload,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: /(jpg|jpeg|png)$/,
+        })
+        .addMaxSizeValidator({
+          maxSize: 1024 * 1024 * 5,
+        })
+        .build({
+          fileIsRequired: false,
+          errorHttpStatusCode: 422,
+        })
+    ) image: Express.Multer.File
+  ) {
+    return this.usersService.create({ ...payload, profile_picture: image?.path });
   }
 
   @Put(':id')
   @UseGuards(JwtAuthGuard, new PermissionGuard('edit users'))
-  update(@Body() payload: UpdateUsersPayload, @Param('id') id: string) {
-    return this.usersService.update(payload, id);
+  @UseInterceptors(FileInterceptor('image', multerConfig))
+  update(
+    @Body() payload: UpdateUsersPayload, 
+    @Param('id') id: string,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: /(jpg|jpeg|png)$/,
+        })
+        .addMaxSizeValidator({
+          maxSize: 1024 * 1024 * 5,
+        })
+        .build({
+          fileIsRequired: false,
+          errorHttpStatusCode: 422,
+        })
+    ) image: Express.Multer.File
+  ) {
+    return this.usersService.update({ ...payload, profile_picture: image?.path }, id);
   }
 
   @Delete(':id')

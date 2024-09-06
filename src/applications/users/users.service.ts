@@ -14,6 +14,7 @@ import { AuthenticationsService } from '../authentications/authentications.servi
 import { Role } from '../roles/role.entity';
 import { User } from './user.entity';
 import { ChangePasswordPayload } from './payloads/changePassword.payload';
+import { UpdateProfilePayload } from './payloads/updateProfile.payload';
 @Injectable()
 export class UsersService {
   constructor(
@@ -33,6 +34,7 @@ export class UsersService {
       const user = new User();
       user.email = payload.email;
       user.password = hashedPassword;
+      user.phone_number = payload.phone_number;
       user.first_name = payload.first_name;
       user.last_name = payload.last_name;
       user.phone_number = payload.phone_number;
@@ -59,6 +61,7 @@ export class UsersService {
         password: payload.password ? await this.authService.hashPassword(payload.password) : user.password,
         first_name: payload.first_name,
         last_name: payload.last_name,
+        profile_picture: payload.profile_picture ?? undefined,
       };
 
       await this._validateUpdate(id, data);
@@ -131,6 +134,23 @@ export class UsersService {
       const hashedPassword: string = await this.authService.hashPassword(payload.password);
 
       await this.userRepository.update({ id: user.id }, { password: hashedPassword });
+
+      return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.UPDATE_SUCCESS, 'Success');
+    } catch (error) {
+      handleHttpError(error);
+    }
+  }
+
+  async updateProfile(userContext: any, payload: UpdateProfilePayload): Promise<HttpCustomResponse> {
+    try {
+      const data: Partial<User> = {
+        first_name: payload.first_name,
+        last_name: payload.last_name,
+        profile_picture: payload.profile_picture ?? undefined,
+        phone_number: payload.phone_number,
+      };
+
+      await this.userRepository.update({ id: userContext.id }, data);
 
       return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.UPDATE_SUCCESS, 'Success');
     } catch (error) {
