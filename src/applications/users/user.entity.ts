@@ -29,6 +29,9 @@ export class User {
   @Column('varchar')
     phone_number: string;
 
+  @Column({ type: 'varchar', nullable: true, default: null })
+    profile_picture: string;
+
   @Exclude({ toPlainOnly: true }) 
   @Column({ type: 'varchar', nullable: true, default: null })
     verification_code: string | null;

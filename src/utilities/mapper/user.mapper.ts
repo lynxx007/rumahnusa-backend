@@ -15,6 +15,7 @@ export function mapUserToJwtPayload(user: Partial<User>): AuthenticatedUser {
     id: user.id,
     email: user.email,
     first_name: user.first_name,
+    profile_picture: user.profile_picture,
     last_name: user.last_name,
     phone_number: user.phone_number,
     role: user.role?.title,

@@ -18,6 +18,7 @@ export class AuthenticationStrategy extends PassportStrategy(Strategy) {
     return {
       id: payload.id,
       email: payload.email,
+      profile_picture: payload.profile_picture,
       first_name: payload.first_name,
       last_name: payload.last_name,
       phone_number: payload.phone_number,

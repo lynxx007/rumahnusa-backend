@@ -3,6 +3,7 @@ export interface AuthenticatedUser {
     email: string,
     first_name: string,
     last_name: string,
+    profile_picture: string | null,
     phone_number: string,
     role: string | null,
     permissions: Array<string> | null,
