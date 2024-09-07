@@ -7,6 +7,7 @@ import { UpdatePermissionsPayload } from './payloads/updatePermission.payload';
 
 import { JwtAuthGuard } from '../authentications/guards/jwt.guard';
 import { PermissionGuard } from '../authentications/guards/permission.guard';
+import { BulkDeletePermissionPayload } from './payloads/bulkDeletePermissions.payload';
 
 @Controller('permissions')
 export class PermissionsController {
@@ -37,5 +38,11 @@ export class PermissionsController {
   @UseGuards(JwtAuthGuard, new PermissionGuard('delete permissions'))
   destroy(@Param('id') id: string) {
     return this.permissionsService.delete(id);
+  }
+
+  @Post('bulk-delete')
+  @UseGuards(JwtAuthGuard, new PermissionGuard('delete permissions'))
+  bulkDelete(@Body() payload: BulkDeletePermissionPayload) {
+    return this.permissionsService.bulkDelete(payload);
   }
 }

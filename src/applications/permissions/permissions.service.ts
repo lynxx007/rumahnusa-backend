@@ -11,6 +11,7 @@ import { HTTP_CUSTOM_MESSAGES } from 'src/const/http.const';
 import { HttpCustomResponse } from 'src/types/http.types';
 
 import { handleHttpError, isEmpty } from 'src/utilities/helper';
+import { BulkDeletePermissionPayload } from './payloads/bulkDeletePermissions.payload';
 
 @Injectable()
 export class PermissionsService {
@@ -62,5 +63,17 @@ export class PermissionsService {
     queryBuilder.orderBy('permission.created_at', 'DESC');
 
     return paginate<Permission>(queryBuilder, options);
+  }
+
+  async bulkDelete(payload: BulkDeletePermissionPayload): Promise<HttpCustomResponse> {
+    try {
+      const deletePromises = payload.permissions.map((permission) =>
+        this.permissionRepository.delete({ id: permission.id }),
+      );
+      await Promise.all(deletePromises);
+      return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.DELETE_SUCCESS, 'Ok');
+    } catch (error) {
+      handleHttpError(error);
+    }
   }
 }
