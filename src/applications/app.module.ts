@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 // Configurations
 import { DB_CONFIG } from 'src/database/config';
-import { MAILER_OPTIONS } from 'src/const/app.const';
+import { MAILER_OPTIONS, STATIC_FILE_OPTIONS } from 'src/const/app.const';
 
 // Modules
 import { RolesModule } from './roles/roles.module';
@@ -21,6 +22,7 @@ import { IsUniqueConstraint } from 'src/rules/isUniqueConstraint';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot(STATIC_FILE_OPTIONS),
     TypeOrmModule.forRoot(DB_CONFIG), 
     MailerModule.forRoot(MAILER_OPTIONS),
     UsersModule, 

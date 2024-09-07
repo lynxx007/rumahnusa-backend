@@ -3,6 +3,7 @@ import { JwtModuleOptions } from '@nestjs/jwt';
 import { MailerOptions } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
+import { ServeStaticModuleOptions } from '@nestjs/serve-static';
 dotenv.config();
 
 export const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS, 10) || 5;
@@ -46,4 +47,9 @@ export const MAILER_OPTIONS: MailerOptions = {
       strict: true,
     },
   },
+};
+
+export const STATIC_FILE_OPTIONS: ServeStaticModuleOptions = {
+  rootPath: join(__dirname, '..', '..', 'uploads'),
+  serveRoot: '/uploads',
 };
