@@ -12,6 +12,7 @@ import { CreateRolesPayload } from './payloads/createRoles.payload';
 import { UpdateRolesPayload } from './payloads/updateRoles.payload';
 
 import { Role } from './role.entity';
+import { BulkDeleteRolePayload } from './payloads/bulkDeleteRoles.payload';
 @Injectable()
 export class RolesService {
   constructor(
@@ -78,5 +79,16 @@ export class RolesService {
     queryBuilder.orderBy('role.created_at', 'DESC');
 
     return paginate<Role>(queryBuilder, options);
+  }
+
+  async bulkDelete(payload: BulkDeleteRolePayload): Promise<HttpCustomResponse> {
+    try {
+      const deleteRoles = payload.roles?.map((role) => 
+        this.roleRepository.delete({ id: role.id } ));
+      await Promise.all(deleteRoles);
+      return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.DELETE_SUCCESS, 'Ok');
+    } catch (error) {
+      handleHttpError(error);
+    }
   }
 }

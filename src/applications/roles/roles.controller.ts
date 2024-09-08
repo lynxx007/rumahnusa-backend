@@ -6,6 +6,7 @@ import { HTTP_QUERY_PARAMS } from 'src/const/http.const';
 
 import { JwtAuthGuard } from '../authentications/guards/jwt.guard';
 import { PermissionGuard } from '../authentications/guards/permission.guard';
+import { BulkDeleteRolePayload } from './payloads/bulkDeleteRoles.payload';
 
 @Controller('roles')
 export class RolesController {
@@ -42,5 +43,11 @@ export class RolesController {
   @UseGuards(JwtAuthGuard, new PermissionGuard('delete roles'))
   destroy(@Param('id') id: string) {
     return this.rolesService.delete(id);
+  }
+
+  @Post('bulk-delete')
+  @UseGuards(JwtAuthGuard, new PermissionGuard('delete roles'))
+  bulkDelete(@Body() payload: BulkDeleteRolePayload) {
+    return this.rolesService.bulkDelete(payload);
   }
 }
