@@ -84,7 +84,7 @@ export class RolesService {
   async bulkDelete(payload: BulkDeleteRolePayload): Promise<HttpCustomResponse> {
     try {
       const deleteRoles = payload.roles?.map((role) => 
-        this.roleRepository.delete({ id: role.id } ));
+        this.roleRepository.softDelete({ id: role.id } ));
       await Promise.all(deleteRoles);
       return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.DELETE_SUCCESS, 'Ok');
     } catch (error) {
