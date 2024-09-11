@@ -8,10 +8,12 @@ dotenv.config();
 
 export const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS, 10) || 5;
 export const JWT_SECRET = process.env.JWT_SECRET || 'LZ-STARTER';
+export const RESET_PASSWORD_TOKEN_SECRET = process.env.RESET_PASSWORD_TOKEN_SECRET || 'LZ-STARTER';
 export const APP_PORT: number = (process.env.PORT as unknown as number) || 8000;
 export const DEFAULT_ROLE_NAME = process.env.DEFAULT_ROLE_NAME || 'User';
 export const APP_NAME: string = process.env.APP_NAME || 'Lezenda';
 export const EMAIL_VERIFICATION_EXPIRATION_IN_HOURS: number = Number(process.env.EMAIL_VERIFICATION_EXPIRATION_IN_HOURS);
+export const ADMIN_APP_URL = process.env.ADMIN_APP_URL;
 
 export const MAIL_HOST = process.env.MAIL_HOST;
 export const MAIL_PORT = Number(process.env.MAIL_PORT);

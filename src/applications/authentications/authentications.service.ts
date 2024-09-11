@@ -1,15 +1,15 @@
-import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { Injectable, NotFoundException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MailerService } from '@nestjs-modules/mailer';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 
-import { SALT_ROUNDS } from 'src/const/app.const';
+import { ADMIN_APP_URL, RESET_PASSWORD_TOKEN_SECRET, SALT_ROUNDS } from 'src/const/app.const';
 import { HTTP_CUSTOM_MESSAGES } from 'src/const/http.const';
 import { DEFAULT_ROLE_NAME } from 'src/const/app.const';
-import { VerificationCodeMailContext, WelcomeMailContext } from 'src/mail/interfaces';
-import { WELCOME_EMAIL_SUBJECT, EMAIL_VERIFICATION_SUBJECT } from 'src/const/mail.const';
+import { ResetPasswordMailContext, VerificationCodeMailContext, WelcomeMailContext } from 'src/mail/interfaces';
+import { WELCOME_EMAIL_SUBJECT, EMAIL_VERIFICATION_SUBJECT, RESET_PASSWORD_SUBJECT } from 'src/const/mail.const';
 
 import { mapUserToJwtPayload, mapUserToAuthResponse } from 'src/utilities/mapper/user.mapper';
 import { handleHttpError, isEmpty, generateOtp, getOtpExpirationTime, dateHasPassed } from 'src/utilities/helper';
@@ -25,6 +25,8 @@ import { User } from '../users/user.entity';
 import MailPayload from 'src/mail/entities';
 import { EmailVerificationPayload } from './payloads/verification.payload';
 import { ResendEmailVerificationPayload } from './payloads/resend-verification.payload';
+import { ResetPasswordPayload } from './payloads/reset-password.payload';
+import { RequestPasswordResetPayload } from './payloads/request-password-reset.payload';
 
 @Injectable()
 export class AuthenticationsService {
@@ -153,7 +155,65 @@ export class AuthenticationsService {
     await this.mailService.sendMail(mailPayload);
   }
 
+  async _sendPasswordResetEmail(user: User, data: ResetPasswordMailContext) {
+    const mailTemplate: string = './reset-password';
+    const mailSubject: string = RESET_PASSWORD_SUBJECT;
+    const mailPayload: MailPayload = new MailPayload(user, mailSubject, mailTemplate, data);
+    await this.mailService.sendMail(mailPayload);
+  }
+
   _generateJwtToken(user: User): string {
     return this.jwtService.sign(mapUserToJwtPayload(user)); 
+  }
+
+  _generateResetPasswordToken(payload: any, jwtConfig: JwtSignOptions): string {
+    return this.jwtService.sign(payload, jwtConfig);
+  }
+
+  async requestPasswordReset(payload: RequestPasswordResetPayload): Promise<any> {
+    try {
+      const user: User = await this.userRepository.findOneBy({ email: payload.email });
+      if (isEmpty(user)) throw new NotFoundException('The provided email was not found');
+
+      // generate password reset token
+      const tokenConfig: JwtSignOptions = {
+        expiresIn: '60m',
+        secret: RESET_PASSWORD_TOKEN_SECRET,
+      };
+
+      const passwordResetPayload = {
+        id: user.id,
+        email: user.email,
+        type: 'Password Reset',
+      };
+
+      const passwordResetToken: string = this._generateResetPasswordToken(passwordResetPayload, tokenConfig);
+      const passwordResetLink: string = `${ADMIN_APP_URL}/reset-password?token=${passwordResetToken}`;
+
+      this._sendPasswordResetEmail(user, { name: user.first_name, link: passwordResetLink });
+
+      return new HttpCustomResponse('Instructions to reset your password will be sent to your email in a minute', 'Ok');
+
+    } catch (error) {
+      handleHttpError(error);
+    }
+  }
+
+  async resetPassword(payload: ResetPasswordPayload): Promise<HttpCustomResponse> {
+    try {
+      const jwtPayload = this.jwtService.verify(payload.token, { secret: RESET_PASSWORD_TOKEN_SECRET });
+      const user: User = await this.userRepository.findOneBy({ id: jwtPayload.id });
+      
+      if (isEmpty(user)) throw new UnauthorizedException('Invalid token');
+
+      const isOldPassword: boolean = await this.validatePassword(payload.password, user.password);
+      if (isOldPassword) throw new UnprocessableEntityException('New password cannot be the same as the old password');
+
+      await this.userRepository.update({ id: user.id }, { password: await this.hashPassword(payload.password) });
+
+      return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.DEFAULT);
+    } catch (error) {
+      handleHttpError(error);
+    }
   }
 }

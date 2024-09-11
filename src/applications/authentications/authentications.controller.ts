@@ -5,6 +5,8 @@ import { Body } from '@nestjs/common';
 import { RegistrationPayload } from './payloads/register.payload';
 import { EmailVerificationPayload } from './payloads/verification.payload';
 import { ResendEmailVerificationPayload } from './payloads/resend-verification.payload';
+import { RequestPasswordResetPayload } from './payloads/request-password-reset.payload';
+import { ResetPasswordPayload } from './payloads/reset-password.payload';
 
 @Controller('auth')
 export class AuthenticationsController {
@@ -30,6 +32,16 @@ export class AuthenticationsController {
   @Put('verify/resend')
   resendVerifyEmail(@Body() payload: ResendEmailVerificationPayload) {
     return this.authenticationsService.resendVerificationEmail(payload);
+  }
+
+  @Post('forgot-password')
+  forgotPassword(@Body() payload: RequestPasswordResetPayload) {
+    return this.authenticationsService.requestPasswordReset(payload);
+  }
+
+  @Post('reset-password')
+  resetPassword(@Body() payload: ResetPasswordPayload) {
+    return this.authenticationsService.resetPassword(payload);
   }
 
 }
