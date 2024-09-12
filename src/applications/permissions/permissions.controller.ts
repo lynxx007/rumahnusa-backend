@@ -24,6 +24,7 @@ export class PermissionsController {
   index(
     @Query('page') page: number = HTTP_QUERY_PARAMS.DEFAULT_PAGE,
     @Query('limit') limit: number = HTTP_QUERY_PARAMS.DEFAULT_LIMIT
+    //Todo: Use DTO to handle queries
   ) {
     return this.permissionsService.paginate({ page, limit });
   }
