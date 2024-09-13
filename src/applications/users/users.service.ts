@@ -15,6 +15,7 @@ import { Role } from '../roles/role.entity';
 import { User } from './user.entity';
 import { ChangePasswordPayload } from './payloads/changePassword.payload';
 import { UpdateProfilePayload } from './payloads/updateProfile.payload';
+import { BulkDeleteUserPayload } from './payloads/bulk-delete-users.payload';
 @Injectable()
 export class UsersService {
   constructor(
@@ -155,6 +156,18 @@ export class UsersService {
       const jwtToken: string = this.authService._generateJwtToken(user);
 
       return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.UPDATE_SUCCESS, 'Success', { token: jwtToken });
+    } catch (error) {
+      handleHttpError(error);
+    }
+  }
+
+  async bulkDelete(payload: BulkDeleteUserPayload): Promise<HttpCustomResponse> {
+    try {
+      const deleteUsers = payload.users?.map((user) => {
+        this.userRepository.softDelete({ id: user.id });
+      });
+      await Promise.all(deleteUsers);
+      return new HttpCustomResponse(HTTP_CUSTOM_MESSAGES.DELETE_SUCCESS);
     } catch (error) {
       handleHttpError(error);
     }

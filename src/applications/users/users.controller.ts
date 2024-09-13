@@ -9,6 +9,7 @@ import { JwtAuthGuard } from '../authentications/guards/jwt.guard';
 import { PermissionGuard } from '../authentications/guards/permission.guard';
 import { ChangePasswordPayload } from './payloads/changePassword.payload';
 import { UpdateProfilePayload } from './payloads/updateProfile.payload';
+import { BulkDeleteUserPayload } from './payloads/bulk-delete-users.payload';
 
 @Controller('users')
 export class UsersController {
@@ -116,5 +117,11 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, new PermissionGuard('delete users'))
   destroy(@Param('id') id: string) {
     return this.usersService.destroy(id);
+  }
+
+  @Post('/bulk-delete')
+  @UseGuards(JwtAuthGuard, new PermissionGuard('delete users'))
+  bulkDelete(@Body() payload: BulkDeleteUserPayload) {
+    return this.usersService.bulkDelete(payload);
   }
 }
