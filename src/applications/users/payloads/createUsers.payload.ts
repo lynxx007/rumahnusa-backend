@@ -6,6 +6,7 @@ import {
 } from 'class-validator';
 import { PASSWORD_VALIDATION_OPTIONS } from 'src/const/options.const';
 import { IsUnique } from 'src/decorators/IsUnique';
+import { Role } from 'src/applications/roles/role.entity';
 
 export class CreateUsersPayload {
   @IsNotEmpty()
@@ -30,7 +31,7 @@ export class CreateUsersPayload {
   readonly password: string;
 
   @IsNotEmpty()
-  readonly role_id: string;
+  readonly role: Partial<Role>;
 
   profile_picture: string | null;
 }

@@ -29,8 +29,8 @@ export class UsersService {
   async create(payload: CreateUsersPayload): Promise<User> {
     try {
       const hashedPassword: string = await this.authService.hashPassword(payload.password);
-      const role: Role = await this.roleRepository.findOne({ where: { id: payload.role_id } });
-      if (isEmpty(role)) throw new NotFoundException('Invalid role.');
+      // const role: Role = await this.roleRepository.findOne({ where: { id: payload.role_id } });
+      // if (isEmpty(role)) throw new NotFoundException('Invalid role.');
 
       const user = new User();
       user.email = payload.email;
@@ -39,7 +39,7 @@ export class UsersService {
       user.first_name = payload.first_name;
       user.last_name = payload.last_name;
       user.phone_number = payload.phone_number;
-      user.role = role;
+      user.role = payload.role as Role;
 
       return this.userRepository.save(user);
     } catch (error) {
@@ -88,7 +88,7 @@ export class UsersService {
 
   async findOne(id: string): Promise<HttpCustomResponse> {
     try {
-      const user: User = await this.userRepository.findOne({ where: { id } });
+      const user: User = await this.userRepository.findOne({ where: { id }, relations: ['role'] });
       if (isEmpty(user)) throw new NotFoundException(HTTP_CUSTOM_MESSAGES.NOT_FOUND);
       return new HttpCustomResponse(
         HTTP_CUSTOM_MESSAGES.DEFAULT,
