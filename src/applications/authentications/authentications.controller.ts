@@ -35,11 +35,13 @@ export class AuthenticationsController {
   }
 
   @Post('forgot-password')
+  @HttpCode(200)
   forgotPassword(@Body() payload: RequestPasswordResetPayload) {
     return this.authenticationsService.requestPasswordReset(payload);
   }
 
   @Post('reset-password')
+  @HttpCode(200)
   resetPassword(@Body() payload: ResetPasswordPayload) {
     return this.authenticationsService.resetPassword(payload);
   }
